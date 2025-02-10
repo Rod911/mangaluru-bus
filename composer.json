@@ -1,9 +1,7 @@
 {
-    "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "rod911/mangaluru-bus",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Search for your bus in Mangalore City.",
     "license": "MIT",
     "require": {
         "php": "^8.2",
