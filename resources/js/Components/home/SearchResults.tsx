@@ -1,23 +1,28 @@
-import { MapPin, Clock, DollarSign, BusFrontIcon } from "lucide-react";
-import { Location, RouteResults } from "@/types";
+import { MapPin, BusFrontIcon, ExternalLink } from "lucide-react";
+import { IndirectRoute, Location, RouteResults, RouteStop } from "@/types";
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "@/Components/ui/accordion";
+import { Link } from "@inertiajs/react";
 
 export default function SearchResults({
     routes,
     from,
     to,
+    indirectRoutes,
+    intersectStops,
 }: {
     routes: RouteResults[];
     from: Location;
     to: Location;
+    indirectRoutes: IndirectRoute[];
+    intersectStops: RouteStop[];
 }) {
     return (
-        <Accordion type="multiple" className="grid gap-2">
+        <Accordion type="multiple" className="flex flex-col gap-2">
             {routes.map((result, index) => {
                 const stopOrder = result.stop_order.toSorted((a, b) => a - b);
                 const towardsLast =
@@ -63,25 +68,15 @@ export default function SearchResults({
                                     Local / Private
                                 </span>
                             )}
-                            <div className="flex w-1/6 ml-8">
-                                {/* <div className="flex items-center">
-                                    <Clock className="mr-2" size={20} />
-                                    <span>
-                                        {result.departure} - {result.arrival}
-                                    </span>
-                                </div> */}
+                            <div className="flex md:w-1/6 w-1/4 md:ml-8 ml-3 mr-2">
                                 <div className="flex items-center">
                                     <MapPin className="mr-2" size={20} />
                                     <span>{stopsBetween} stops</span>
                                 </div>
-                                {/* <div className="flex items-center">
-                                    <DollarSign className="mr-2" size={20} />
-                                    <span>{result.fare}</span>
-                                </div> */}
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className="border-t border-gray-200 py-4 px-8">
-                            <ul className="flex flex-col">
+                        <AccordionContent className="border-t border-gray-200 py-4 px-5">
+                            <ul className="">
                                 {routeStops.map((stop, index) => {
                                     const startIndex =
                                         index === sortedStopOrder[0];
@@ -96,11 +91,11 @@ export default function SearchResults({
                                     return (
                                         <li
                                             key={index}
-                                            className="flex relative items-center gap-3 text-lg py-1"
+                                            className="flex relative items-center gap-3 text-lg py-1 max-w-full"
                                         >
                                             <div
                                                 className={
-                                                    "relative rounded-full p-0.5 size-7 content-center place-items-center " +
+                                                    "relative rounded-full p-0.5 size-7 content-center place-items-center flex-shrink-0 " +
                                                     (startIndex
                                                         ? "bg-green-600 text-white"
                                                         : endIndex
@@ -122,13 +117,13 @@ export default function SearchResults({
                                                 )}
                                                 <MapPin size={18} />
                                             </div>
-                                            <div className="">
-                                                <p className="flex place-items-baseline gap-2">
+                                            <div className="max-w-full overflow-hidden">
+                                                <p className="flex place-items-baseline gap-2 text-nowrap">
                                                     {
                                                         stop.location
                                                             .location_name
                                                     }
-                                                    <small className="text-sm text-gray-700">
+                                                    <small className="text-sm text-gray-700 overflow-hidden text-ellipsis">
                                                         {stop.location.address}
                                                     </small>
                                                 </p>
@@ -141,16 +136,192 @@ export default function SearchResults({
                     </AccordionItem>
                 );
             })}
-            {routes.length === 0 && (
+            {routes.length === 0 && indirectRoutes.length === 0 && (
                 <div className="bg-white rounded-lg shadow-md border-t border-gray-100">
                     <div className="p-4 justify-start hover:no-underline">
-                        <div className="flex justify-between items-center w-1/4">
+                        <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold flex items-center gap-2 w-full">
-                                <BusFrontIcon /> No Routes Found
+                                <BusFrontIcon className="align-top" /> No Routes
+                                Found
                             </h2>
                         </div>
                     </div>
                 </div>
+            )}
+            {indirectRoutes.length > 0 && (
+                <>
+                    <div className="bg-white rounded-lg shadow-md border-t border-gray-100">
+                        <div className="p-4 justify-start hover:no-underline">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-xl font-bold w-full">
+                                    <BusFrontIcon className="inline-block mr-2 align-top" />
+                                    Connecting routes are available, you can
+                                    click the icons to switch busses at
+                                    locations marked as
+                                    <div className="inline-block align-middle ml-2 relative rounded-full p-0.5 size-7 content-center place-items-center bg-purple-600 text-white">
+                                        <ExternalLink size={18} />
+                                    </div>
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    {indirectRoutes.map((route, index) => {
+                        const result = route.route;
+                        const towardsLast =
+                            result.route_stops[result.boardingPoint].location
+                                .uuid === from.uuid;
+                        const routeStops = towardsLast
+                            ? result.route_stops
+                            : result.route_stops.toReversed();
+                        const sortedBoardingPoint = towardsLast
+                            ? result.boardingPoint
+                            : routeStops.length - result.boardingPoint - 1;
+                        return (
+                            <AccordionItem
+                                value={result.route_name}
+                                key={index}
+                                className="bg-white rounded-lg shadow-md border-t border-gray-100"
+                            >
+                                <AccordionTrigger className="p-4 cursor-pointer justify-start hover:no-underline hover:bg-gray-100">
+                                    <div className="flex justify-between items-center w-1/4">
+                                        <h2 className="text-xl font-bold flex items-center gap-2 w-full">
+                                            <BusFrontIcon /> {result.route_name}
+                                        </h2>
+                                    </div>
+                                    <div className="flex-grow text-end mr-2">
+                                        {result.has_express == 1 && (
+                                            <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
+                                                Express
+                                            </span>
+                                        )}
+                                        {result.has_govt == 1 && (
+                                            <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
+                                                KSRTC
+                                            </span>
+                                        )}
+                                        {result.has_local == 1 && (
+                                            <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
+                                                Local / Private
+                                            </span>
+                                        )}
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="border-t border-gray-200 py-4 px-5">
+                                    <ul className="flex flex-col">
+                                        {routeStops.map((stop, index) => {
+                                            const startIndex =
+                                                index === sortedBoardingPoint;
+                                            const deboardIndex =
+                                                route.switchingPoints.find(
+                                                    (point) =>
+                                                        point.order === index
+                                                );
+                                            return (
+                                                <li
+                                                    key={index}
+                                                    className="flex relative items-center gap-3 text-lg py-1"
+                                                >
+                                                    <div
+                                                        className={
+                                                            "relative rounded-full p-0.5 size-7 content-center place-items-center flex-shrink-0 " +
+                                                            (startIndex
+                                                                ? "bg-green-600 text-white"
+                                                                : deboardIndex
+                                                                ? "bg-purple-600 text-white"
+                                                                : "bg-gray-300")
+                                                        }
+                                                    >
+                                                        {index > 0 && (
+                                                            <hr
+                                                                className={
+                                                                    "border-0 absolute bottom-full w-1 h-2 left-1/2 -translate-x-1/2 bg-gray-300"
+                                                                }
+                                                            />
+                                                        )}
+                                                        {deboardIndex ? (
+                                                            <Link
+                                                                className="block"
+                                                                href={
+                                                                    "/search?from=" +
+                                                                    stop
+                                                                        .location
+                                                                        .uuid +
+                                                                    "&towards=" +
+                                                                    to.uuid +
+                                                                    "&type=location"
+                                                                }
+                                                            >
+                                                                <ExternalLink
+                                                                    size={18}
+                                                                />
+                                                            </Link>
+                                                        ) : (
+                                                            <MapPin size={18} />
+                                                        )}
+                                                    </div>
+                                                    <div className="max-w-full overflow-hidden">
+                                                        <p className="flex place-items-baseline gap-2 text-nowrap">
+                                                            {
+                                                                stop.location
+                                                                    .location_name
+                                                            }
+                                                            <small className="text-sm text-gray-700 overflow-hidden text-ellipsis">
+                                                                {
+                                                                    stop
+                                                                        .location
+                                                                        .address
+                                                                }
+                                                            </small>
+                                                        </p>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </AccordionContent>
+                            </AccordionItem>
+                        );
+                    })}
+                </>
+            )}
+            {intersectStops.length > 0 && (
+                <>
+                    <div className="bg-white rounded-lg shadow-md border-t border-gray-100">
+                        <div className="p-4 justify-start hover:no-underline">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-xl font-bold w-full">
+                                    <ExternalLink className="inline-block mr-2 align-top" />
+                                    Select the connecting location to continue
+                                    towards {to.location_name}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    {intersectStops.map((stop, index) => {
+                        return (
+                            <Link
+                                href={
+                                    "/search?from=" +
+                                    stop.location.uuid +
+                                    "&towards=" +
+                                    to.uuid +
+                                    "&type=location"
+                                }
+                                key={index}
+                                className="bg-white rounded-lg shadow-md border-t border-gray-100"
+                            >
+                                <div className="p-4 justify-start hover:no-underline">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-xl font-bold w-full">
+                                            <MapPin className="inline-block mr-2" />
+                                            {stop.location.location_name}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </Link>
+                        );
+                    })}
+                </>
             )}
         </Accordion>
     );

@@ -42,6 +42,9 @@ export default {
                 primary: {
                     DEFAULT: "#009fd8",
                 },
+                destructive: {
+                    DEFAULT: "#b91c1c",
+                },
             },
         },
     },

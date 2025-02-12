@@ -16,9 +16,9 @@ class RouteStop extends Model {
         'bus_stop_id',
     ];
 
-    // public function route(): BelongsTo {
-    //     return $this->belongsTo(Route::class);
-    // }
+    public function route(): BelongsTo {
+        return $this->belongsTo(Route::class, 'route_id', 'uuid');
+    }
 
     public function location(): BelongsTo {
         return $this->belongsTo(Location::class, 'location_id', 'uuid');

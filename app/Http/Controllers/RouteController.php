@@ -7,13 +7,11 @@ use App\Models\Location;
 use App\Http\Requests\Admin\Routes\StoreRouteRequest;
 use App\Http\Requests\Admin\Routes\DestroyRouteRequest;
 use App\Http\Requests\Admin\Routes\UpdateRouteRequest;
-use App\Models\RouteStop;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use PhpParser\Node\Stmt\Foreach_;
 
 class RouteController extends Controller {
     public function index() {

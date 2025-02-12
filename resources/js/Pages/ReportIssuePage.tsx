@@ -2,7 +2,7 @@ import { Head, useForm } from "@inertiajs/react";
 import Layout from "../Components/Layout";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { FormEventHandler, useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import { Select, Textarea } from "@headlessui/react";
 
 export default function ReportIssuePage({
@@ -13,7 +13,12 @@ export default function ReportIssuePage({
     response?: { success: boolean; message: string };
 }) {
     const { data, setData, post, processing, progress, errors, reset } =
-        useForm({
+        useForm<{
+            issueType: string;
+            description: string;
+            photo: File | null;
+            contactInfo: string;
+        }>({
             issueType: "",
             description: "",
             photo: null,
@@ -87,6 +92,17 @@ export default function ReportIssuePage({
                         <label htmlFor="photo" className="block mb-1 font-bold">
                             Photo (optional)
                         </label>
+                        {data.photo && (
+                            <div className="mb-2 flex gap-2 items-start">
+                                <img
+                                    src={URL.createObjectURL(data.photo)}
+                                    alt="Photo"
+                                    className="border p-1"
+                                    width={200}
+                                />
+                                <button type="button" onClick={() => setData("photo", null)}><X /></button>
+                            </div>
+                        )}
                         <div className="flex items-center">
                             <input
                                 type="file"

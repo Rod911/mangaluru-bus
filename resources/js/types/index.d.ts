@@ -65,6 +65,13 @@ export type RouteResults = Route & {
     stop_order: [number, number];
 };
 
+export type IndirectRoute = {
+    route: Route & {
+        boardingPoint: number;
+    };
+    switchingPoints: RouteStop[];
+}
+
 export type Issue = {
     id: number;
     type: "incorrect_route" | "site_issue" | "other";

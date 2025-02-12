@@ -54,6 +54,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('issues')
             ->group(function () {
                 Route::get('/', [IssueController::class, 'index'])->name('issues.view');
+                Route::delete('destroy', [IssueController::class, 'destroy'])->name('issues.destroy');
             });
     });
 

@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import { Search } from "lucide-react";
-import Select from "react-select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Location } from "@/types";
+import { Combobox } from "../custom-ui/combobox";
+import { Form, FormField, FormItem, FormMessage } from "../ui/form";
 
+const FormSchema = z.object({
+    from: z.string({ required_error: "Please select from location" }),
+    towards: z.string({ required_error: "Please select to location" }),
+});
 export default function SearchSection({
     locations,
 }: {
@@ -12,9 +20,11 @@ export default function SearchSection({
     const [searchType, setSearchType] = useState("location");
 
     const [values, setValues] = useState({
-        from: "",
-        towards: "",
         route: "",
+    });
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
     });
 
     function handleChange(key: string | null = "", value: string = "") {
@@ -26,7 +36,11 @@ export default function SearchSection({
             : null;
     }
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    function handleSubmit(data: z.infer<typeof FormSchema>) {
+        router.get("/search", { ...data, type: searchType });
+    }
+
+    function handleRouteSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         router.get("/search", { ...values, type: searchType });
     }
@@ -62,46 +76,66 @@ export default function SearchSection({
                     </button>
                 </div>
                 {searchType === "location" ? (
-                    <form
-                        className="flex flex-col md:flex-row gap-4"
-                        method="GET"
-                        onSubmit={handleSubmit}
-                    >
-                        <Select
-                            options={locationOptions}
-                            placeholder="From"
-                            className="w-full"
-                            required
-                            name="from"
-                            defaultValue={values.from}
-                            onChange={(option) =>
-                                handleChange("from", option?.value)
-                            }
-                        />
-                        <Select
-                            options={locationOptions}
-                            placeholder="To"
-                            className="w-full"
-                            required
-                            name="to"
-                            defaultValue={values.towards}
-                            onChange={(option) =>
-                                handleChange("towards", option?.value)
-                            }
-                        />
-                        <button
-                            type="submit"
-                            className="bg-primary text-white p-2 rounded flex items-center justify-center"
+                    <Form {...form}>
+                        <form
+                            className="flex flex-col items-start md:flex-row gap-4"
+                            method="GET"
+                            onSubmit={form.handleSubmit(handleSubmit)}
                         >
-                            <Search size={20} className="mr-2" />
-                            Search
-                        </button>
-                    </form>
+                            <FormField
+                                control={form.control}
+                                name="from"
+                                render={({ field }) => (
+                                    <FormItem className="w-full ">
+                                        <Combobox
+                                            options={locationOptions}
+                                            placeholder="From"
+                                            noResults="No locations found."
+                                            onChange={(option) =>
+                                                form.setValue(
+                                                    field.name,
+                                                    option
+                                                )
+                                            }
+                                        />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                name="towards"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem className="w-full ">
+                                        <Combobox
+                                            options={locationOptions}
+                                            placeholder="To"
+                                            noResults="No locations found."
+                                            onChange={(option) =>
+                                                form.setValue(
+                                                    field.name,
+                                                    option
+                                                )
+                                            }
+                                        />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <button
+                                type="submit"
+                                className="bg-primary text-white p-2 rounded flex items-center justify-center"
+                            >
+                                <Search size={20} className="mr-2" />
+                                Search
+                            </button>
+                        </form>
+                    </Form>
                 ) : (
                     <form
                         className="flex gap-4"
                         method="GET"
-                        onSubmit={handleSubmit}
+                        onSubmit={handleRouteSubmit}
                     >
                         <input
                             type="text"
@@ -125,7 +159,10 @@ export default function SearchSection({
                 )}
             </div>
             <div className="mt-4 text-right">
-                <Link href="/report-issue" className="bg-gray-50 text-primary py-2 px-4 rounded inline-block">
+                <Link
+                    href="/report-issue"
+                    className="bg-gray-50 text-primary py-2 px-4 rounded inline-block"
+                >
                     Report Issue
                 </Link>
             </div>

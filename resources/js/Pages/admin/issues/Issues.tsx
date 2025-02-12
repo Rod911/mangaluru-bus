@@ -31,7 +31,7 @@ export default function Issues({ issues }: { issues: Issue[] }) {
         { label: "Updated", key: "updated_at", type: "date" },
     ];
     const hasSlNo = true;
-    const hasAction = false;
+    const hasAction = true;
 
     return (
         <AdminView title="Issues">
@@ -41,6 +41,7 @@ export default function Issues({ issues }: { issues: Issue[] }) {
                 hasAction={hasAction}
                 data={issues}
                 recordKey="id"
+                deleteRoute="issues.destroy"
             />
         </AdminView>
     );
