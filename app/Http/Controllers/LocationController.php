@@ -46,8 +46,8 @@ class LocationController extends Controller {
         ]);
 
         $location = Location::create([
-            'location_name' => trim($request->locationName),
-            'address' => trim($request->locationAddress),
+            'location_name' => $request->locationName,
+            'address' => $request->locationAddress,
         ]);
         foreach (($request->busStops ?? []) as $stop) {
             $stop_data = [

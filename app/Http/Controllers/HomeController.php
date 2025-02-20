@@ -48,6 +48,7 @@ class HomeController extends Controller {
         foreach ($routes as &$route) {
             $route->stop_order = json_decode('[' . $route->stop_order . ']', true);
         }
+        $routeNames = array_column($routes->toArray(), 'route_name');
         $indirectRoutes = [];
         $intersectStops = [];
         $intersectStopsDetails = [];
@@ -55,6 +56,7 @@ class HomeController extends Controller {
             $sourceBus = Route::select('routes.*', 'route_stops.order as boardingPoint')
                 ->join('route_stops', 'route_stops.route_id', '=', 'routes.uuid')
                 ->where('route_stops.location_id', $from)
+                ->whereNotIn('routes.route_name', $routeNames)
                 ->groupBy('routes.uuid')
                 ->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
                 ->get()
