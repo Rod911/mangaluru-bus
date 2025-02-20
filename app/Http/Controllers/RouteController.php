@@ -15,13 +15,29 @@ use Inertia\Inertia;
 
 class RouteController extends Controller {
     public function index() {
-        return Inertia::render('admin/routes/Routes', [
-            'routes' => Route::selectRaw('count(route_stops.route_id) as stop_count, routes.*')
-                ->orderByRaw('CAST(SUBSTR(route_name, 1, INSTR(route_name || "A", "A")-1) AS INTEGER)')
-                ->orderBy('route_name')
-                ->join('route_stops', 'route_stops.route_id', '=', 'routes.uuid', 'left')
-                ->groupBy('routes.uuid')
-                ->get(),
+        return Inertia::render('admin/routes/Routes');
+    }
+
+    public function paginateRoutes(Request $request) {
+        $page = $request->page ?? 1;
+        $pageSize = $request->pageSize ?? 10;
+        $query = $request->search ?? '';
+        $locations = Route::selectRaw('count(route_stops.route_id) as stop_count, routes.*')
+            ->orderByRaw('CAST(SUBSTR(route_name, 1, INSTR(route_name || "A", "A")-1) AS INTEGER)')
+            ->orderBy('route_name')
+            ->join('route_stops', 'route_stops.route_id', '=', 'routes.uuid', 'left')
+            ->groupBy('routes.uuid')
+            ->limit($pageSize)
+            ->offset(($page - 1) * $pageSize)
+            ->where('route_name', 'like', '%' . $query . '%')
+            ->get();
+        return response()->json([
+            'data' => $locations,
+            'pagination' => [
+                'total' => Route::where('route_name', 'like', '%' . $query . '%')->count(),
+                'current_page' => (int) $page,
+                'per_page' => (int) $pageSize
+            ]
         ]);
     }
 

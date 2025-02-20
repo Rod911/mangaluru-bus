@@ -33,6 +33,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('locations')
             ->group(function () {
                 Route::get('/', [LocationController::class, 'index'])->name('locations.view');
+                Route::get('paginate', [LocationController::class, 'paginateLocations'])->name('locations.paginate');
                 Route::get('create', [LocationController::class, 'create'])->name('locations.create');
                 Route::post('store', [LocationController::class, 'store'])->name('locations.store');
                 Route::get('edit', [LocationController::class, 'edit'])->name('locations.edit');
@@ -43,6 +44,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('routes')
             ->group(function () {
                 Route::get('/', [RouteController::class, 'index'])->name('routes.view');
+                Route::get('paginate', [RouteController::class, 'paginateRoutes'])->name('routes.paginate');
                 Route::get('create', [RouteController::class, 'create'])->name('routes.create');
                 Route::post('store', [RouteController::class, 'store'])->name('routes.store');
                 Route::get('edit', [RouteController::class, 'edit'])->name('routes.edit');
@@ -54,6 +56,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('issues')
             ->group(function () {
                 Route::get('/', [IssueController::class, 'index'])->name('issues.view');
+                Route::get('paginate', [IssueController::class, 'paginateIssues'])->name('issues.paginate');
                 Route::delete('destroy', [IssueController::class, 'destroy'])->name('issues.destroy');
             });
     });

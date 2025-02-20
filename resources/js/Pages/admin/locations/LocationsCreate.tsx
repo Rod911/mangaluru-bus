@@ -108,7 +108,6 @@ export default function Locations({ location }: { location?: Location }) {
                                             (s, i) => i !== index
                                         );
                                         setData("busStops", filtered);
-                                        console.log(filtered);
                                     }}
                                 />
                             ))}

@@ -41,6 +41,9 @@ export default {
             colors: {
                 primary: {
                     DEFAULT: "#009fd8",
+                    hover: "#0088b9",
+                    focus: "#006fa2",
+                    text: "#fff",
                 },
                 destructive: {
                     DEFAULT: "#b91c1c",

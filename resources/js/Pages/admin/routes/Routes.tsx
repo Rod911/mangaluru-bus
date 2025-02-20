@@ -2,7 +2,7 @@ import DataTable from "@/Components/admin/DataTable";
 import AdminView from "@/Layouts/admin/View";
 import { Route, Row } from "@/types";
 
-export default function Routes({ routes }: { routes: Route[] }) {
+export default function Routes() {
     const columns = [
         { label: "Route Name", key: "route_name" },
         { label: "Stops", key: "stop_count" },
@@ -17,7 +17,7 @@ export default function Routes({ routes }: { routes: Route[] }) {
                 columns={columns}
                 hasSlNo={hasSlNo}
                 hasAction={hasAction}
-                data={routes}
+                paginate={route("routes.paginate")}
                 recordKey="uuid"
                 tableName="route"
                 editRoute="routes.edit"

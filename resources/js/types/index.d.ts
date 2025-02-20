@@ -20,6 +20,14 @@ type Row = {
 } & (T extends "enum" ? { enums: Record<string, string> } : { enums?: never }) &
     (T extends "tags" ? { tags: Record<string, string> } : { tags?: never });
 
+export type FetchResponse = {
+    data: Row[];
+    pagination: {
+        current_page: number;
+        per_page: number;
+        total: number;
+    };
+};
 type dbBool = 0 | 1;
 
 export type LocationStop = {
@@ -70,11 +78,20 @@ export type IndirectRoute = {
         boardingPoint: number;
     };
     switchingPoints: RouteStop[];
-}
+};
+
+export const IssueOptions = {
+    incorrect_route: "Incorrect / Missing route information",
+    incorrect_location: "Incorrect / Missing location information",
+    site_issue: "Broken UI / Bugs in application",
+    other: "Other",
+};
+
+export type IssueOptionsType = keyof typeof IssueOptions;
 
 export type Issue = {
     id: number;
-    type: "incorrect_route" | "site_issue" | "other";
+    type: IssueOptionsType;
     description: string;
     image: string?;
     contact: string?;

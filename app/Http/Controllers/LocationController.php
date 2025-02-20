@@ -12,8 +12,25 @@ use Inertia\Inertia;
 
 class LocationController extends Controller {
     public function index() {
-        return Inertia::render('admin/locations/Locations', [
-            'locations' => Location::orderBy('location_name')->get(),
+        return Inertia::render('admin/locations/Locations');
+    }
+
+    public function paginateLocations(Request $request) {
+        $page = $request->page ?? 1;
+        $pageSize = $request->pageSize ?? 10;
+        $query = $request->search ?? '';
+        $locations = Location::orderBy('location_name')
+            ->limit($pageSize)
+            ->offset(($page - 1) * $pageSize)
+            ->where('location_name', 'like', '%' . $query . '%')
+            ->get();
+        return response()->json([
+            'data' => $locations,
+            'pagination' => [
+                'total' => Location::where('location_name', 'like', '%' . $query . '%')->count(),
+                'current_page' => (int) $page,
+                'per_page' => (int) $pageSize
+            ]
         ]);
     }
 

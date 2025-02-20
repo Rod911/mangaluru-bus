@@ -1,7 +1,7 @@
 import { Head, useForm } from "@inertiajs/react";
 import Layout from "../Components/Layout";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler } from "react";
 import { Camera, X } from "lucide-react";
 import { Select, Textarea } from "@headlessui/react";
 

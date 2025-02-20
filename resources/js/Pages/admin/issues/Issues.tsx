@@ -2,7 +2,7 @@ import DataTable from "@/Components/admin/DataTable";
 import AdminView from "@/Layouts/admin/View";
 import { Issue, Row } from "@/types";
 
-export default function Issues({ issues }: { issues: Issue[] }) {
+export default function Issues() {
     const columns: Row[] = [
         {
             label: "Type",
@@ -10,6 +10,7 @@ export default function Issues({ issues }: { issues: Issue[] }) {
             type: "enum",
             enums: {
                 incorrect_route: "Incorrect / Missing route information",
+                incorrect_location: "Incorrect / Missing location information",
                 site_issue: "Broken UI / Bugs in application",
                 other: "Other",
             },
@@ -39,7 +40,7 @@ export default function Issues({ issues }: { issues: Issue[] }) {
                 columns={columns}
                 hasSlNo={hasSlNo}
                 hasAction={hasAction}
-                data={issues}
+                paginate={route("issues.paginate")}
                 recordKey="id"
                 deleteRoute="issues.destroy"
             />

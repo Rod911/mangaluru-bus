@@ -133,7 +133,6 @@ const OptionsList = ({
                             );
                             setValue(selectedValue);
                             onChange(option.value);
-                            console.log(option.value);
                             setOpen(false);
                         }}
                         // className="cursor-pointer"
