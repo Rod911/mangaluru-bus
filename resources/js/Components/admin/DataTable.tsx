@@ -68,7 +68,12 @@ export default function DataTable({
                 [recordKey]: recordToDelete[recordKey],
             }),
             {
-                onSuccess: () => closeDeleteModal(),
+                onSuccess: () => {
+                    closeDeleteModal();
+                    queryClient.refetchQueries({
+                        queryKey: [tableName],
+                    });
+                },
             }
         );
     };
@@ -203,11 +208,6 @@ function Dtable({
             });
     };
 
-    // const [pagination, setPagination] = useState<FetchResponse["pagination"]>({
-    //     current_page: 1,
-    //     total: 0,
-    //     per_page: pageSize,
-    // });
     let pagination = {
         current_page: 1,
         total: 0,
@@ -217,8 +217,6 @@ function Dtable({
     const [page, setPage] = useState<number>(1);
     let pageStart = 0;
 
-    if (paginate) {
-    }
     const { isPending, isError, error, data, isFetching } = pagination
         ? useQuery({
               queryKey: [tableName, page, pageSize, pageQuery],

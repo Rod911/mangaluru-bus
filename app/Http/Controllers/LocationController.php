@@ -49,7 +49,7 @@ class LocationController extends Controller {
             'location_name' => trim($request->locationName),
             'address' => trim($request->locationAddress),
         ]);
-        foreach ($request->busStops as $stop) {
+        foreach (($request->busStops ?? []) as $stop) {
             $stop_data = [
                 'stop_description' => trim($stop['stop_description']),
                 'is_two_way' => $stop['is_two_way'],

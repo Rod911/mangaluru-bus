@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Admin\Routes\DestroyIssueRequest;
 use App\Models\Issue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class IssueController extends Controller {
         $page = $request->page ?? 1;
         $pageSize = $request->pageSize ?? 10;
         $query = $request->search ?? '';
-        $issues = Issue::orderBy('description')
+        $issues = Issue::orderBy('created_at', 'desc')
             ->limit($pageSize)
             ->offset(($page - 1) * $pageSize)
             ->where('description', 'like', '%' . $query . '%')
@@ -31,10 +32,12 @@ class IssueController extends Controller {
         ]);
     }
 
-    public function destroy(Request $request) {
+    public function destroy(DestroyIssueRequest $request) {
         $issue = Issue::find($request->id);
         $issue->delete();
-        $delete = Storage::disk('public')->delete($issue->image);
+        if ($issue->image != null) {
+            $delete = Storage::disk('public')->delete($issue->image);
+        }
         return redirect(route('issues.view'));
     }
 }
