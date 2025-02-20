@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests\Admin\Routes;
+namespace App\Http\Requests\Admin\Issues;
 
-use App\Models\Routes;
+use App\Models\Issues;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

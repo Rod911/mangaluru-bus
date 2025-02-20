@@ -40,6 +40,7 @@ export default function Issues() {
                 columns={columns}
                 hasSlNo={hasSlNo}
                 hasAction={hasAction}
+                tableName="issue"
                 paginate={route("issues.paginate")}
                 recordKey="id"
                 deleteRoute="issues.destroy"

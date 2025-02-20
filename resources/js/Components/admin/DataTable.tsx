@@ -54,7 +54,7 @@ export default function DataTable({
     tableData?: TableRow[];
     paginate?: string;
     recordKey: string;
-    tableName?: string;
+    tableName: string;
     editRoute?: string;
     deleteRoute?: string;
     pageSizes?: Record<string | number, number>;

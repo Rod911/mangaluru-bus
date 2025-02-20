@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Admin\Routes\DestroyIssueRequest;
+use App\Http\Requests\Admin\Issues\DestroyIssueRequest;
 use App\Models\Issue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -34,9 +34,11 @@ class IssueController extends Controller {
 
     public function destroy(DestroyIssueRequest $request) {
         $issue = Issue::find($request->id);
-        $issue->delete();
-        if ($issue->image != null) {
-            $delete = Storage::disk('public')->delete($issue->image);
+        if ($issue) {
+            $issue->delete();
+            if ($issue->image != null) {
+                $delete = Storage::disk('public')->delete($issue->image);
+            }
         }
         return redirect(route('issues.view'));
     }
