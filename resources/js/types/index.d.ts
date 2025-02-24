@@ -13,28 +13,48 @@ export type PageProps<
     };
 };
 
-type Row = {
+type RowCol = {
     type?: "image" | "date" | "longtext" | "tag" | "enum" | "string" = "string";
     key: string;
     label: string;
-} & (T extends "enum" ? { enums: Record<string, string> } : { enums?: never }) &
-    (T extends "tags" ? { tags: Record<string, string> } : { tags?: never });
+} & (T extends "enum"
+    ? {
+          enums: Record<string, string>;
+          tags?: never;
+          actions?: never;
+      }
+    : {
+          enums?: never;
+      }) &
+    (T extends "tags"
+        ? {
+              tags: Record<string, string>;
+              actions: Record<
+                  string,
+                  string | { path: string; params: Record<string, string> }
+              >;
+              enums?: never;
+          }
+        : {
+              tags?: never;
+              actions?: never;
+          });
 
 export type FetchResponse = {
-    data: Row[];
+    data: RowCol[];
     pagination: {
         current_page: number;
         per_page: number;
         total: number;
+        query: string;
     };
 };
-type dbBool = 0 | 1;
 
 export type LocationStop = {
     uuid: string;
     stop_description: string;
-    is_two_way: dbBool;
-    coordinates: string;
+    is_two_way: boolean;
+    coordinates?: { latitude: number; longitude: number };
     created_at: Date;
     updated_at: Date;
 };

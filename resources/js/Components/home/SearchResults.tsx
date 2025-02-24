@@ -179,7 +179,7 @@ export default function SearchResults({
                         return (
                             <AccordionItem
                                 value={result.route_name}
-                                key={index}
+                                key={"C-" + index}
                                 className="bg-white rounded-lg shadow-md border-t border-gray-100"
                             >
                                 <AccordionTrigger className="p-4 cursor-pointer justify-start hover:no-underline hover:bg-gray-100">

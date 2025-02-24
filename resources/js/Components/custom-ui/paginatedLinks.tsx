@@ -21,7 +21,7 @@ export const PaginatedLinks = ({
     const current_page = pagination.current_page;
     const totalPages = Math.ceil(total / per_page);
 
-    if (totalPages <= 1) {
+    if (totalPages < 1) {
         return null;
     }
 

@@ -4,12 +4,13 @@ import Modal from "@/Components/Modal";
 import SecondaryButton from "@/Components/SecondaryButton";
 import SelectInput from "@/Components/SelectInput";
 import TextInput from "@/Components/TextInput";
+import { Button } from "@/Components/ui/button";
+import { PaginatedLinks } from "@/Components/custom-ui/paginatedLinks";
 
 import { Ban, Ellipsis, PencilLine, Trash } from "lucide-react";
 import { FormEventHandler, useState } from "react";
-import { useForm } from "@inertiajs/react";
-import { FetchResponse, Row } from "@/types";
-import { PaginatedLinks } from "@/Components/custom-ui/paginatedLinks";
+import { useForm, router } from "@inertiajs/react";
+import { FetchResponse, RowCol } from "@/types";
 
 import {
     useQuery,
@@ -26,9 +27,54 @@ const queryClient = new QueryClient({
     },
 });
 
-type TableRow = Record<Row["key"], string | any> & {
+type TableRow = Record<RowCol["key"], string | any> & {
     uuid?: string;
     id?: number;
+};
+
+function createQueryString(
+    obj: { [x: string]: any },
+    prefix: string = ""
+): string {
+    var str = [],
+        p;
+    for (p in obj) {
+        if (obj.hasOwnProperty(p)) {
+            var k = prefix ? prefix + "[" + p + "]" : p,
+                v = obj[p];
+            str.push(
+                v !== null && typeof v === "object"
+                    ? createQueryString(v, k)
+                    : encodeURIComponent(k) + "=" + encodeURIComponent(v)
+            );
+        }
+    }
+    return str.join("&");
+}
+
+function parseQueryString(str: string = location.search) {
+    const urlParams = new URLSearchParams(str);
+    const result: { [x: string]: any } = {};
+    for (const [key, value] of urlParams.entries()) {
+        const matches = key.match(/^([^\[]+)\[([^\]]+)\]$/);
+        if (matches) {
+            const parentKey = matches[1];
+            const childKey = matches[2];
+            if (!result[parentKey]) {
+                result[parentKey] = {};
+            }
+            result[parentKey][childKey] = value;
+        } else {
+            result[key] = value;
+        }
+    }
+    return result;
+}
+
+const urlParams = (parseQueryString().pagination || {}) as {
+    page?: number;
+    pageSize?: number;
+    pageQuery?: string;
 };
 
 export default function DataTable({
@@ -48,7 +94,7 @@ export default function DataTable({
         100: 100,
     },
 }: {
-    columns: Row[];
+    columns: RowCol[];
     hasSlNo: boolean;
     hasAction: boolean;
     tableData?: TableRow[];
@@ -90,9 +136,11 @@ export default function DataTable({
     };
 
     const [pageSize, setPageSize] = useState<number>(
-        pageSizes[Object.keys(pageSizes)[0]]
+        urlParams.pageSize || pageSizes[Object.keys(pageSizes)[0]]
     );
-    const [pageQuery, setPageQuery] = useState<string>("");
+    const [pageQuery, setPageQuery] = useState<string>(
+        urlParams.pageQuery || ""
+    );
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -105,13 +153,17 @@ export default function DataTable({
                             onChange={(e) =>
                                 setPageSize(Number(e.target.value))
                             }
+                            value={pageSize}
                         />
                     </div>
                     <div className="dtable-param">
                         <TextInput
                             type="text"
                             className="dtable-search"
-                            onChange={(e) => setPageQuery(e.target.value)}
+                            onChange={(e) => {
+                                setPageQuery(e.target.value);
+                            }}
+                            value={pageQuery}
                         />
                     </div>
                 </div>
@@ -179,7 +231,7 @@ function Dtable({
     pageQuery: string;
     paginate?: string;
     hasSlNo: boolean;
-    columns: Row[];
+    columns: RowCol[];
     hasAction: boolean;
     recordKey: string;
     editRoute?: string;
@@ -203,7 +255,20 @@ function Dtable({
             }
         )
             .then((response) => response.json())
-            .then((result) => {
+            .then((result: FetchResponse) => {
+                window.history.replaceState(
+                    {},
+                    "",
+                    location.pathname +
+                        "?" +
+                        createQueryString({
+                            pagination: {
+                                page: result.pagination.current_page,
+                                pageSize: result.pagination.per_page,
+                                pageQuery: result.pagination.query,
+                            },
+                        })
+                );
                 return result;
             });
     };
@@ -214,7 +279,7 @@ function Dtable({
         per_page: pageSize,
     } as FetchResponse["pagination"];
 
-    const [page, setPage] = useState<number>(1);
+    const [page, setPage] = useState<number>(urlParams.page || 1);
     let pageStart = 0;
 
     const { isPending, isError, error, data, isFetching } = pagination
@@ -237,6 +302,66 @@ function Dtable({
         tableData = data.data;
         pagination = data.pagination;
         pageStart = (pagination.current_page - 1) * pagination.per_page;
+    }
+
+    function cell(row: TableRow, column: RowCol) {
+        const content = row[column.key] as string;
+        switch (column.type) {
+            case "date":
+                return new Date(content).toLocaleDateString();
+            case "longtext":
+                return content;
+            case "tag":
+                return (
+                    <Button
+                        className={
+                            "px-2 py-1 rounded " + column.tags?.[content]
+                        }
+                        onClick={async () => {
+                            if (column.actions?.[content]) {
+                                const action =
+                                    typeof column.actions[content] === "string"
+                                        ? column.actions[content]
+                                        : column.actions[content].path;
+                                const params =
+                                    typeof column.actions[content] === "string"
+                                        ? { [recordKey]: row[recordKey] }
+                                        : {
+                                              [recordKey]: row[recordKey],
+                                              ...column.actions[content].params,
+                                          };
+                                router.patch(route(action), params, {
+                                    preserveState: true,
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        Accept: "application/json",
+                                    },
+                                    onSuccess: () => {
+                                        queryClient.refetchQueries({
+                                            queryKey: [tableName],
+                                        });
+                                    },
+                                });
+                            }
+                        }}
+                    >
+                        {content}
+                    </Button>
+                );
+            case "enum":
+                return column.enums?.[content];
+            case "image":
+                const url = "/storage/" + content;
+                return (
+                    content && (
+                        <a href={url} target="_blank">
+                            <img src={url} height={50} width={50} />
+                        </a>
+                    )
+                );
+            default:
+                return content;
+        }
     }
 
     return (
@@ -275,7 +400,7 @@ function Dtable({
                                         className="border px-2 py-1"
                                         key={column.key}
                                     >
-                                        {cell(row[column.key], column)}
+                                        {cell(row, column)}
                                     </td>
                                 ))}
                                 {hasAction && (
@@ -294,7 +419,15 @@ function Dtable({
                                                                 editRoute,
                                                                 {
                                                                     [recordKey]:
-                                                                        row.uuid,
+                                                                        row[
+                                                                            recordKey
+                                                                        ],
+                                                                    pagination:
+                                                                        {
+                                                                            page,
+                                                                            pageSize,
+                                                                            pageQuery,
+                                                                        },
                                                                 }
                                                             )}
                                                             className="flex gap-3"
@@ -347,7 +480,7 @@ function Dtable({
                         </tr>
                     )}
                 </tbody>
-                {paginate && (tableData?.length || 0) > 0 && (
+                {paginate && (
                     <tfoot>
                         <tr>
                             <td
@@ -378,32 +511,4 @@ function Dtable({
             </table>
         </>
     );
-}
-
-function cell(content: string, column: Row) {
-    switch (column.type) {
-        case "date":
-            return new Date(content).toLocaleDateString();
-        case "longtext":
-            return content;
-        case "tag":
-            return (
-                <span className={"px-2 py-1 rounded " + column.tags?.[content]}>
-                    {content}
-                </span>
-            );
-        case "enum":
-            return column.enums?.[content];
-        case "image":
-            const url = "/storage/" + content;
-            return (
-                content && (
-                    <a href={url} target="_blank">
-                        <img src={url} height={50} width={50} />
-                    </a>
-                )
-            );
-        default:
-            return content;
-    }
 }

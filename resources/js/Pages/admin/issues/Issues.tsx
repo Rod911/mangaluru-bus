@@ -1,9 +1,9 @@
 import DataTable from "@/Components/admin/DataTable";
 import AdminView from "@/Layouts/admin/View";
-import { Issue, Row } from "@/types";
+import { Issue, RowCol } from "@/types";
 
 export default function Issues() {
-    const columns: Row[] = [
+    const columns: RowCol[] = [
         {
             label: "Type",
             key: "type",
@@ -25,6 +25,16 @@ export default function Issues() {
             tags: {
                 open: "bg-red-500 text-white",
                 closed: "bg-green-500 text-white",
+            },
+            actions: {
+                open: {
+                    path: "issues.toggle-tag",
+                    params: { action: "closed" },
+                },
+                closed: {
+                    path: "issues.toggle-tag",
+                    params: { action: "open" },
+                },
             },
         },
         { label: "Notes", key: "notes", type: "longtext" },

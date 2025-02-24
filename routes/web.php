@@ -58,6 +58,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [IssueController::class, 'index'])->name('issues.view');
                 Route::get('paginate', [IssueController::class, 'paginateIssues'])->name('issues.paginate');
                 Route::delete('destroy', [IssueController::class, 'destroy'])->name('issues.destroy');
+                Route::patch('toggle-tag', [IssueController::class, 'toggleTag'])->name('issues.toggle-tag');
             });
     });
 

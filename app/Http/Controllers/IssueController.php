@@ -42,4 +42,11 @@ class IssueController extends Controller {
         }
         return redirect(route('issues.view'));
     }
+
+    public function toggleTag(Request $request) {
+        $issue = Issue::find($request->id);
+        $issue->status = $request->action;
+        $issue->save();
+        return redirect(route('issues.view'));
+    }
 }

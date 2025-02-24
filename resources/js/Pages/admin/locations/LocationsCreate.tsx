@@ -3,17 +3,23 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import SecondaryButton from "@/Components/SecondaryButton";
 import TextInput from "@/Components/TextInput";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/Components/ui/popover";
 import AdminView from "@/Layouts/admin/View";
 import { Location, LocationStop } from "@/types";
 import { useForm } from "@inertiajs/react";
-import { Trash } from "lucide-react";
+import { MapPinnedIcon, Trash } from "lucide-react";
 import { FormEventHandler } from "react";
+import LeafletMap from "@/Components/LeafletMap";
 
 export default function Locations({ location }: { location?: Location }) {
     const newStop = {
         uuid: "",
         stop_description: "",
-        is_two_way: 0,
+        is_two_way: false,
     } as LocationStop;
 
     const { data, setData, post, patch, processing, errors, reset } = useForm({
@@ -86,6 +92,8 @@ export default function Locations({ location }: { location?: Location }) {
                             <tr>
                                 <th>Description</th>
                                 <th>2 Way?</th>
+                                <th>Lat</th>
+                                <th>Lon</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -165,6 +173,20 @@ function LocationStopRow({
     set: (value: LocationStop) => void;
     remove: () => void;
 }) {
+    const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const text = e.clipboardData?.getData("text");
+        if (text) {
+            const [latitude, longitude] = text.split(",");
+            set({
+                ...stop,
+                coordinates: {
+                    latitude: parseFloat(latitude),
+                    longitude: parseFloat(longitude),
+                },
+            });
+        }
+    };
     return (
         <tr key={index}>
             <td>
@@ -177,7 +199,7 @@ function LocationStopRow({
                     onChange={(e) => {
                         set({ ...stop, stop_description: e.target.value });
                     }}
-                    required
+                    // required
                 />
             </td>
             <td className="text-center">
@@ -185,21 +207,81 @@ function LocationStopRow({
                     type="checkbox"
                     name={`is_two_way[${index}]`}
                     value="1"
-                    defaultChecked={stop.is_two_way === 1}
+                    defaultChecked={stop.is_two_way}
                     className="w-6 h-6 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     autoComplete="off"
                     onChange={(e) => {
-                        set({ ...stop, is_two_way: e.target.checked ? 1 : 0 });
+                        set({ ...stop, is_two_way: e.target.checked });
                     }}
                 />
             </td>
             <td>
+                <TextInput
+                    type="text"
+                    name={`latitude[${index}]`}
+                    value={stop.coordinates?.latitude || ""}
+                    className="w-full"
+                    autoComplete="off"
+                    onChange={(e) => {
+                        set({
+                            ...stop,
+                            coordinates: {
+                                ...stop.coordinates,
+                                latitude: parseFloat(e.target.value),
+                                longitude: stop.coordinates?.longitude || 0,
+                            },
+                        });
+                    }}
+                    onPaste={onPaste}
+                />
+            </td>
+            <td>
+                <TextInput
+                    type="text"
+                    name={`longitude[${index}]`}
+                    value={stop.coordinates?.longitude || ""}
+                    className="w-full"
+                    autoComplete="off"
+                    onChange={(e) => {
+                        set({
+                            ...stop,
+                            coordinates: {
+                                ...stop.coordinates,
+                                longitude: parseFloat(e.target.value),
+                                latitude: stop.coordinates?.latitude || 0,
+                            },
+                        });
+                    }}
+                    onPaste={onPaste}
+                />
+            </td>
+            <td>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <PrimaryButton
+                            type="button"
+                            className="text-white bg-primary py-2.5"
+                        >
+                            <MapPinnedIcon size={20} />
+                        </PrimaryButton>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-96 h-80 p-1">
+                        {/* <iframe src={`https://maps.google.com/maps?q=${stop.coordinates?.latitude},${stop.coordinates?.longitude}&z=15&output=embed&disableDefaultUI=true`} width="100%" height="100%" className="w-full h-full rounded block"></iframe> */}
+                        <LeafletMap
+                            position={[
+                                stop.coordinates?.latitude || 0,
+                                stop.coordinates?.longitude || 0,
+                            ]}
+                            zoom={16}
+                        />
+                    </PopoverContent>
+                </Popover>
                 <PrimaryButton
                     type="button"
-                    className="text-white bg-red-600"
+                    className="text-white bg-red-600 py-2.5"
                     onClick={remove}
                 >
-                    <Trash size={15} />
+                    <Trash size={20} />
                 </PrimaryButton>
                 <input
                     type="hidden"

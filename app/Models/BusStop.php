@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Coordinates;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,4 +17,15 @@ class BusStop extends Model {
         'is_two_way',
         'coordinates',
     ];
+    protected $spatialFields = [
+        'coordinates',
+    ];
+    protected $casts = [
+        'is_two_way' => 'boolean',
+    ];
+    protected function casts(): array {
+        return [
+            'coordinates' => Coordinates::class,
+        ];
+    }
 }

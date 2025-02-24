@@ -29,13 +29,30 @@ class LocationController extends Controller {
             'pagination' => [
                 'total' => Location::where('location_name', 'like', '%' . $query . '%')->count(),
                 'current_page' => (int) $page,
-                'per_page' => (int) $pageSize
+                'per_page' => (int) $pageSize,
+                'query' => $query
             ]
         ]);
     }
 
     public function create() {
         return Inertia::render('admin/locations/LocationsCreate');
+    }
+
+    private function getPostData($request) {
+        return [
+            'location' => [
+                'location_name' => $request->locationName,
+                'address' => $request->locationAddress ?? "",
+            ],
+            'busStops' => array_map(function ($stop) {
+                return [
+                    'stop_description' => trim($stop['stop_description']),
+                    'is_two_way' => $stop['is_two_way'],
+                    'coordinates' => $stop['coordinates'],
+                ];
+            }, ($request->busStops ?? [])),
+        ];
     }
 
     public function store(StoreLocationRequest $request) {
@@ -45,15 +62,9 @@ class LocationController extends Controller {
             ]
         ]);
 
-        $location = Location::create([
-            'location_name' => $request->locationName,
-            'address' => $request->locationAddress,
-        ]);
-        foreach (($request->busStops ?? []) as $stop) {
-            $stop_data = [
-                'stop_description' => trim($stop['stop_description']),
-                'is_two_way' => $stop['is_two_way'],
-            ];
+        $postData = $this->getPostData($request);
+        $location = Location::create($postData['location']);
+        foreach (($postData['busStops']) as $stop_data) {
             $newStops = $location->busStops()->create($stop_data);
         }
 
@@ -75,18 +86,12 @@ class LocationController extends Controller {
             ],
         ]);
 
-        $location->update([
-            'location_name' => trim($request->locationName),
-            'address' => trim($request->locationAddress),
-        ]);
+        $postData = $this->getPostData($request);
+        $location->update($postData['location']);
 
         $existingStops = $location->busStops->keyBy('uuid');
         $updatedUuids = [];
-        foreach ($request->busStops as $stop) {
-            $stop_data = [
-                'stop_description' => trim($stop['stop_description']),
-                'is_two_way' => $stop['is_two_way'],
-            ];
+        foreach (($postData['busStops']) as $stop_data) {
             if (isset($stop['uuid']) && $existingStops->has($stop['uuid'])) {
                 $existingStops->get($stop['uuid'])->update($stop_data);
                 $updatedUuids[] = $stop['uuid'];
