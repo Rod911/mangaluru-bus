@@ -1,29 +1,36 @@
-import { Location, PageProps } from "@/types";
-import { Head, Link } from "@inertiajs/react";
+import { Location, PageProps, PopularLocation } from "@/types";
+import { Head } from "@inertiajs/react";
 
-import Layout from "../Components/Layout";
-import SearchSection from "../Components/home/SearchSection";
-import QuickAccessSection from "../Components/home/QuickAccessSection";
-import NewsUpdatesSection from "../Components/home/NewsUpdatesSection";
-import DownloadAppSection from "../Components/home/DownloadAppSection";
+import Layout from "@/Components/Layout";
+import SearchSection from "@/Components/home/SearchSection";
+import QuickAccessSection from "@/Components/home/QuickAccessSection";
+import FaqSection from "@/Components/home/FaqSection";
+import HomeBodySection from "@/Components/home/HomeBodySection";
 
 export default function HomePage({
     auth,
     app_name,
     locations,
+    popularLocations,
+    popularRoutes,
 }: PageProps<{
     app_name: string;
     locations: Location[];
+    popularLocations: PopularLocation[];
+    popularRoutes: PopularLocation[];
 }>) {
     return (
         <>
-            <Head title="Welcome" />
+            <Head title="City Bus Route Information for Mangaluru | Local, Express & KSRTC Routes"></Head>
             <Layout app_name={app_name}>
                 <div className="container mx-auto px-4 py-8 gap-y-8 grid">
                     <SearchSection locations={locations} />
-                    {/* <QuickAccessSection /> */}
-                    {/* <NewsUpdatesSection /> */}
-                    {/* <DownloadAppSection /> */}
+                    <HomeBodySection />
+                    <QuickAccessSection
+                        popularLocations={popularLocations}
+                        popularRoutes={popularRoutes}
+                    />
+                    <FaqSection />
                 </div>
             </Layout>
         </>

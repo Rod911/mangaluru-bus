@@ -35,11 +35,13 @@ export function Combobox({
     onChange = () => {},
     placeholder = "Select option",
     noResults = "No results found.",
+    triggerClassName = "",
 }: {
     options: Option[];
     onChange?: (value: string) => void;
     placeholder?: string;
     noResults?: string;
+    triggerClassName?: string;
 }) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState<Option>();
@@ -67,7 +69,10 @@ export function Combobox({
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full justify-between px-4"
+                        className={cn(
+                            "w-full justify-between px-4",
+                            triggerClassName
+                        )}
                         size="lg"
                     >
                         {display}
@@ -83,7 +88,10 @@ export function Combobox({
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
+                <Button
+                    variant="outline"
+                    className={cn("w-full justify-start", triggerClassName)}
+                >
                     {display}
                 </Button>
             </DrawerTrigger>
@@ -118,7 +126,7 @@ const OptionsList = ({
     <Command>
         <CommandInput
             placeholder={placeholder}
-            className="border-0 focus:ring-0"
+            className="border-0 focus:ring-0 h-10"
         />
         <CommandList>
             <CommandEmpty>{noResults}</CommandEmpty>

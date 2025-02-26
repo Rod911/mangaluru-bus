@@ -53,17 +53,17 @@ export default function SearchResults({
                                     {result.fare}
                                 </span> */}
                             </div>
-                            {result.has_express == 1 && (
+                            {result.has_express && (
                                 <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
                                     Express
                                 </span>
                             )}
-                            {result.has_govt == 1 && (
+                            {result.has_govt && (
                                 <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
                                     KSRTC
                                 </span>
                             )}
-                            {result.has_local == 1 && (
+                            {result.has_local && (
                                 <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
                                     Local / Private
                                 </span>
@@ -189,17 +189,17 @@ export default function SearchResults({
                                         </h2>
                                     </div>
                                     <div className="flex-grow text-end mr-2">
-                                        {result.has_express == 1 && (
+                                        {result.has_express && (
                                             <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
                                                 Express
                                             </span>
                                         )}
-                                        {result.has_govt == 1 && (
+                                        {result.has_govt && (
                                             <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
                                                 KSRTC
                                             </span>
                                         )}
-                                        {result.has_local == 1 && (
+                                        {result.has_local && (
                                             <span className="bg-gray-300 text-base py-1 px-3 rounded-md ml-auto">
                                                 Local / Private
                                             </span>

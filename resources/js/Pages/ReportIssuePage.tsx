@@ -1,5 +1,5 @@
 import { Head, useForm } from "@inertiajs/react";
-import Layout from "../Components/Layout";
+import Layout from "@/Components/Layout";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { FormEventHandler } from "react";
 import { Camera, X } from "lucide-react";

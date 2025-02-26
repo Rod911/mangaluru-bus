@@ -13,4 +13,9 @@ class Issue extends Model {
         'status',
         'notes',
     ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 }

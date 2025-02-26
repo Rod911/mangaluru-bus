@@ -46,11 +46,12 @@ export type FetchResponse = {
         current_page: number;
         per_page: number;
         total: number;
+        filtered_total: number;
         query: string;
     };
 };
 
-export type LocationStop = {
+export type BusStop = {
     uuid: string;
     stop_description: string;
     is_two_way: boolean;
@@ -63,26 +64,34 @@ export type Location = {
     uuid: string;
     location_name: string;
     address: string;
-    bus_stops: LocationStop[];
+    bus_stops: BusStop[];
     created_at: Date;
     updated_at: Date;
+};
+
+export type LocationDetails = Location & {
+    routes: (Route & {
+        laravel_through_key: Location["uuid"];
+    })[];
+    bus_stops: BusStop[];
 };
 
 export type RouteStop = {
     uuid: string;
     order: number;
     location_id: string;
-    bus_stop_id: string;
+    bus_stop_id?: string;
     location: Location;
-    busStop: BusStop;
+    bus_stop?: BusStop;
+    default_bus_stop?: BusStop;
 };
 
 export type Route = {
     uuid: string;
     route_name: string;
-    has_local: dbBool;
-    has_govt: dbBool;
-    has_express: dbBool;
+    has_local: boolean;
+    has_govt: boolean;
+    has_express: boolean;
     route_stops: RouteStop[];
     stop_count: number;
     created_at: Date;
@@ -113,10 +122,17 @@ export type Issue = {
     id: number;
     type: IssueOptionsType;
     description: string;
-    image: string?;
-    contact: string?;
+    image?: string;
+    contact?: string;
     status: "open" | "closed";
-    notes: string?;
+    notes?: string;
     created_at: Date;
     updated_at: Date;
+};
+
+export type PopularLocation = {
+    type: "location" | "route";
+    from_location?: Location;
+    to_location?: Location;
+    route?: string;
 };

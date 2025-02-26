@@ -5,18 +5,51 @@ namespace App\Http\Controllers;
 use App\Models\Issue;
 use App\Models\Location;
 use App\Models\Route;
-use App\Models\RouteStop;
+use App\Models\SearchLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\File;
 use Inertia\Inertia;
 
 class HomeController extends Controller {
+    public function index() {
+        $locations = Location::orderBy('location_name')->get();
+        $popularLocations = SearchLog::where('type', 'location')
+            ->groupBy('from', 'to')
+            ->orderBy(DB::raw('count(DISTINCT ip)'), 'desc')->limit(5)->get()
+            ->load([
+                'fromLocation',
+                'toLocation',
+            ]);
+        $popularRoutes = SearchLog::where('type', 'route')
+            ->groupBy('route')
+            ->join('routes', function ($join) {
+                $join->on('routes.route_name', 'LIKE', DB::raw('"%" || search_logs.route || "%"'));
+            })
+            ->orderBy(DB::raw('count(DISTINCT ip)'), 'desc')->limit(5)->get();
+        return Inertia::render('Welcome', [
+            'app_name' => env('APP_NAME'),
+            'locations' => $locations,
+            'popularLocations' => $popularLocations,
+            'popularRoutes' => $popularRoutes,
+        ]);
+    }
+
     public function search(Request $request) {
         $type  = $request->query('type');
         $from  = $request->query('from');
         $to  = $request->query('towards');
         $route = $request->query('route');
+
+        SearchLog::create([
+            'type' => $type,
+            'from' => $from ?? "",
+            'to' => $to ?? "",
+            'route' => $route ?? "",
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
         if ($type == 'location') {
             return $this->locationSearch($from, $to);
         }
@@ -69,9 +102,13 @@ class HomeController extends Controller {
                 ->groupBy('routes.uuid')
                 ->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
                 ->get()
-                ->load(['routeStops' => function ($query) {
-                    $query->orderBy('order', 'asc');
-                }, 'routeStops.location']);
+                ->load([
+                    'routeStops' => function ($query) {
+                        $query->orderBy('order', 'asc');
+                    },
+                    'routeStops.location',
+                    'routeStops.defaultBusStop',
+                ]);
 
             foreach ($sourceBus as &$routeA) {
                 // $routeA->boardingPoint
@@ -103,6 +140,7 @@ class HomeController extends Controller {
                 }
             }
         }
+
         return Inertia::render('SearchResultsPage', [
             'app_name' => env('APP_NAME'),
             'from' => $fromLocation,
@@ -114,11 +152,88 @@ class HomeController extends Controller {
     }
 
     private function routeSearch($route) {
-        $routes = Route::whereLike('route_name', '%' . $route . '%')->get()->load(['routeStops' => function ($query) {
-            $query->orderBy('order', 'asc');
-        }, 'routeStops.location']);
+        $routes = Route::whereLike('route_name', '%' . $route . '%')
+            ->orderByRaw('CAST(SUBSTR(route_name, 1, INSTR(route_name || "A", "A")-1) AS INTEGER)')
+            ->orderBy('route_name')
+            ->get()->load([
+                'routeStops' => function ($query) {
+                    $query->orderBy('order', 'asc');
+                },
+                'routeStops.location',
+                'routeStops.defaultBusStop',
+            ]);
         return Inertia::render('RouteResultsPage', [
             'app_name' => env('APP_NAME'),
+            'routes' => $routes,
+        ]);
+    }
+
+    public function allLocations() {
+        $locations = Location::orderBy('location_name')->get();
+        return Inertia::render('AllLocationsPage', [
+            'app_name' => env('APP_NAME'),
+            'locations' => $locations,
+        ]);
+    }
+
+    public function location(Request $request) {
+        $location = $request->location;
+        $location = Location::findOrFail($location)->load([
+            'routes' => function ($query) {
+                $query->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
+                    ->orderBy('route_name');
+            },
+            'routes.routeStops' => function ($query) {
+                $query->orderBy('order', 'asc');
+            },
+            'routes.routeStops.location.busStops',
+            'routes.routeStops.defaultBusStop',
+            'routes.routeStops.busStop',
+            'busStops'
+        ]);
+        return Inertia::render('LocationPage', [
+            'app_name' => env('APP_NAME'),
+            'location' => $location,
+        ]);
+    }
+
+    public function allRoutes($type = null) {
+        $where = '';
+        $title = 'All Routes';
+        switch ($type) {
+            case 'local':
+                $where = 'has_local';
+                $title = 'Local Bus Routes';
+                break;
+            case 'express':
+                $where = 'has_express';
+                $title = 'Express Busses';
+                break;
+            case 'ksrtc':
+                $where = 'has_govt';
+                $title = 'KSRTC Busses';
+                break;
+            default:
+                break;
+        }
+        $routes = Route::select('routes.*');
+        if ($where !== '') {
+            $routes->where($where, 1);
+        }
+        $routes = $routes
+            ->orderByRaw('CAST(SUBSTR(route_name, 1, INSTR(route_name || "A", "A")-1) AS INTEGER)')
+            ->orderBy('route_name')
+            ->get()
+            ->load([
+                'routeStops' => function ($query) {
+                    $query->orderBy('order', 'asc');
+                },
+                'routeStops.location',
+                'routeStops.defaultBusStop',
+            ]);
+        return Inertia::render('AllRoutesPage', [
+            'app_name' => env('APP_NAME'),
+            'title' => $title,
             'routes' => $routes,
         ]);
     }
@@ -158,6 +273,24 @@ class HomeController extends Controller {
                 'success' => true,
                 'message' => 'Issue reported successfully',
             ],
+        ]);
+    }
+
+    public function about() {
+        return Inertia::render('AboutPage', [
+            'app_name' => env('APP_NAME'),
+        ]);
+    }
+
+    public function terms() {
+        return Inertia::render('TermsPage', [
+            'app_name' => env('APP_NAME'),
+        ]);
+    }
+
+    public function privacy() {
+        return Inertia::render('PrivacyPage', [
+            'app_name' => env('APP_NAME'),
         ]);
     }
 }

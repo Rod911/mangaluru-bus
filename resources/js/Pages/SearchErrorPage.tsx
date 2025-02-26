@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import Layout from "../Components/Layout";
+import Layout from "@/Components/Layout";
 
 export default function SearchResultsPage({
     app_name,

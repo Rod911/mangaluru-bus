@@ -16,7 +16,7 @@ export const PaginatedLinks = ({
     pagination: FetchResponse["pagination"];
     setPage: (page: number) => void;
 }) => {
-    const total = pagination.total;
+    const total = pagination.filtered_total;
     const per_page = pagination.per_page;
     const current_page = pagination.current_page;
     const totalPages = Math.ceil(total / per_page);

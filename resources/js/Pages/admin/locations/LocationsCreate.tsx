@@ -9,7 +9,7 @@ import {
     PopoverTrigger,
 } from "@/Components/ui/popover";
 import AdminView from "@/Layouts/admin/View";
-import { Location, LocationStop } from "@/types";
+import { Location, BusStop } from "@/types";
 import { useForm } from "@inertiajs/react";
 import { MapPinnedIcon, Trash } from "lucide-react";
 import { FormEventHandler } from "react";
@@ -20,13 +20,13 @@ export default function Locations({ location }: { location?: Location }) {
         uuid: "",
         stop_description: "",
         is_two_way: false,
-    } as LocationStop;
+    } as BusStop;
 
     const { data, setData, post, patch, processing, errors, reset } = useForm({
         uuid: location?.uuid ?? "",
         locationName: location?.location_name ?? "",
         locationAddress: location?.address ?? "",
-        busStops: location?.bus_stops ?? ([] as LocationStop[]),
+        busStops: location?.bus_stops ?? ([] as BusStop[]),
     });
 
     const submit: FormEventHandler = (e) => {
@@ -103,7 +103,7 @@ export default function Locations({ location }: { location?: Location }) {
                                     index={index}
                                     stop={stop}
                                     key={index}
-                                    set={(value: LocationStop) =>
+                                    set={(value) =>
                                         setData(
                                             "busStops",
                                             data.busStops.map((s, i) =>
@@ -162,6 +162,8 @@ export default function Locations({ location }: { location?: Location }) {
     );
 }
 
+const coordinatesPrecision = 13;
+
 function LocationStopRow({
     index,
     stop,
@@ -169,20 +171,25 @@ function LocationStopRow({
     remove,
 }: {
     index: number;
-    stop: LocationStop;
-    set: (value: LocationStop) => void;
+    stop: BusStop;
+    set: (value: BusStop) => void;
     remove: () => void;
 }) {
     const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-        e.preventDefault();
         const text = e.clipboardData?.getData("text");
         if (text) {
             const [latitude, longitude] = text.split(",");
+            if (!latitude || !longitude) return;
+            e.preventDefault();
             set({
                 ...stop,
                 coordinates: {
-                    latitude: parseFloat(latitude),
-                    longitude: parseFloat(longitude),
+                    latitude: parseFloat(
+                        latitude.substring(0, coordinatesPrecision)
+                    ),
+                    longitude: parseFloat(
+                        longitude.substring(0, coordinatesPrecision)
+                    ),
                 },
             });
         }
@@ -233,6 +240,7 @@ function LocationStopRow({
                         });
                     }}
                     onPaste={onPaste}
+                    maxLength={coordinatesPrecision}
                 />
             </td>
             <td>
@@ -253,6 +261,7 @@ function LocationStopRow({
                         });
                     }}
                     onPaste={onPaste}
+                    maxLength={coordinatesPrecision}
                 />
             </td>
             <td>
@@ -268,9 +277,14 @@ function LocationStopRow({
                     <PopoverContent className="w-96 h-80 p-1">
                         {/* <iframe src={`https://maps.google.com/maps?q=${stop.coordinates?.latitude},${stop.coordinates?.longitude}&z=15&output=embed&disableDefaultUI=true`} width="100%" height="100%" className="w-full h-full rounded block"></iframe> */}
                         <LeafletMap
-                            position={[
-                                stop.coordinates?.latitude || 0,
-                                stop.coordinates?.longitude || 0,
+                            positions={[
+                                {
+                                    pos: {
+                                        lat: stop.coordinates?.latitude || 0,
+                                        lng: stop.coordinates?.longitude || 0,
+                                    },
+                                    label: stop.stop_description,
+                                },
                             ]}
                             zoom={16}
                         />

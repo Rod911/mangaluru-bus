@@ -1,13 +1,13 @@
 import DataTable from "@/Components/admin/DataTable";
 import AdminView from "@/Layouts/admin/View";
-import { Route, Row } from "@/types";
+import { RowCol } from "@/types";
 
 export default function Routes() {
     const columns = [
         { label: "Route Name", key: "route_name" },
         { label: "Stops", key: "stop_count" },
         // { label: "Address", key: "address" },
-    ] as Row[];
+    ] as RowCol[];
     const hasSlNo = true;
     const hasAction = true;
 

@@ -37,12 +37,12 @@ export default function SearchSection({
     }
 
     function handleSubmit(data: z.infer<typeof FormSchema>) {
-        router.get("/search", { ...data, type: searchType });
+        router.get(route("search"), { ...data, type: searchType });
     }
 
     function handleRouteSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        router.get("/search", { ...values, type: searchType });
+        router.get(route("search"), { ...values, type: searchType });
     }
 
     const locationOptions = locations.map((loc) => ({
@@ -78,7 +78,7 @@ export default function SearchSection({
                 {searchType === "location" ? (
                     <Form {...form}>
                         <form
-                            className="flex flex-col items-start md:flex-row gap-4"
+                            className="flex flex-col md:flex-row gap-4"
                             method="GET"
                             onSubmit={form.handleSubmit(handleSubmit)}
                         >
@@ -86,9 +86,10 @@ export default function SearchSection({
                                 control={form.control}
                                 name="from"
                                 render={({ field }) => (
-                                    <FormItem className="w-full ">
+                                    <FormItem className="w-full h-10">
                                         <Combobox
                                             options={locationOptions}
+                                            triggerClassName="h-full"
                                             placeholder="From"
                                             noResults="No locations found."
                                             onChange={(option) =>
@@ -106,9 +107,10 @@ export default function SearchSection({
                                 name="towards"
                                 control={form.control}
                                 render={({ field }) => (
-                                    <FormItem className="w-full ">
+                                    <FormItem className="w-full h-10">
                                         <Combobox
                                             options={locationOptions}
+                                            triggerClassName="h-full"
                                             placeholder="To"
                                             noResults="No locations found."
                                             onChange={(option) =>
@@ -140,7 +142,7 @@ export default function SearchSection({
                         <input
                             type="text"
                             placeholder="Enter route number"
-                            className="flex-1 p-2 border rounded"
+                            className="flex-1 p-2 border border-inherit rounded h-10"
                             required
                             name="route"
                             value={values.route}

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Admin\Issues\DestroyIssueRequest;
 use App\Models\Issue;
+use App\Http\Formatters\Paginate;
+use App\Http\Requests\Admin\Issues\DestroyIssueRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -14,22 +15,8 @@ class IssueController extends Controller {
     }
 
     public function paginateIssues(Request $request) {
-        $page = $request->page ?? 1;
-        $pageSize = $request->pageSize ?? 10;
-        $query = $request->search ?? '';
-        $issues = Issue::orderBy('created_at', 'desc')
-            ->limit($pageSize)
-            ->offset(($page - 1) * $pageSize)
-            ->where('description', 'like', '%' . $query . '%')
-            ->get();
-        return response()->json([
-            'data' => $issues,
-            'pagination' => [
-                'total' => Issue::where('description', 'like', '%' . $query . '%')->count(),
-                'current_page' => (int) $page,
-                'per_page' => (int) $pageSize
-            ]
-        ]);
+        $issues = Issue::orderBy('created_at', 'desc');
+        return Paginate::format($request, Issue::class, $issues, 'description');
     }
 
     public function destroy(DestroyIssueRequest $request) {

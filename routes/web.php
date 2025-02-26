@@ -5,24 +5,19 @@ use App\Http\Controllers\IssueController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RouteController;
-use App\Models\Location;
-use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'app_name' => env('APP_NAME'),
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'locations' => Location::orderBy('location_name')->get(),
-    ]);
-});
-
-Route::get('/search', [HomeController::class, 'search'])->name('search');
-Route::get('/report-issue', [HomeController::class, 'reportIssue'])->name('report-issue');
-Route::post('/report-issue', [HomeController::class, 'storeReportIssue'])->name('report-issue.store');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('search', [HomeController::class, 'search'])->name('search');
+Route::get('all-locations', [HomeController::class, 'allLocations'])->name('all-locations');
+Route::get('location', [HomeController::class, 'location', ['location' => '{location}']])->name('location');
+Route::get('all-routes/{type?}', [HomeController::class, 'allRoutes'])->name('all-routes');
+Route::get('report-issue', [HomeController::class, 'reportIssue'])->name('report-issue');
+Route::post('report-issue', [HomeController::class, 'storeReportIssue'])->name('report-issue.store');
+Route::get('about', [HomeController::class, 'about'])->name('about');
+Route::get('terms', [HomeController::class, 'terms'])->name('terms');
+Route::get('privacy', [HomeController::class, 'privacy'])->name('privacy');
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {

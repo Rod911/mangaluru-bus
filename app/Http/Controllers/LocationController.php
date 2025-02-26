@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use App\Http\Formatters\Paginate;
 use App\Http\Requests\Admin\Location\DestroyLocationRequest;
 use App\Http\Requests\Admin\Location\StoreLocationRequest;
 use App\Http\Requests\Admin\Location\UpdateLocationRequest;
@@ -16,23 +17,8 @@ class LocationController extends Controller {
     }
 
     public function paginateLocations(Request $request) {
-        $page = $request->page ?? 1;
-        $pageSize = $request->pageSize ?? 10;
-        $query = $request->search ?? '';
-        $locations = Location::orderBy('location_name')
-            ->limit($pageSize)
-            ->offset(($page - 1) * $pageSize)
-            ->where('location_name', 'like', '%' . $query . '%')
-            ->get();
-        return response()->json([
-            'data' => $locations,
-            'pagination' => [
-                'total' => Location::where('location_name', 'like', '%' . $query . '%')->count(),
-                'current_page' => (int) $page,
-                'per_page' => (int) $pageSize,
-                'query' => $query
-            ]
-        ]);
+        $locations = Location::orderBy('location_name');
+        return Paginate::format($request, Location::class, $locations, 'location_name');
     }
 
     public function create() {

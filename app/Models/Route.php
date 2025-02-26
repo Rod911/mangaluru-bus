@@ -20,6 +20,17 @@ class Route extends Model {
         'direction',
     ];
 
+    protected $casts = [
+        'has_local' => 'boolean',
+        'has_govt' => 'boolean',
+        'has_express' => 'boolean',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function routeStops(): HasMany {
         return $this->hasMany(RouteStop::class, 'route_id', 'uuid');
     }

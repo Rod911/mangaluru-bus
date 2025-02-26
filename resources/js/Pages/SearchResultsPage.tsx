@@ -35,7 +35,13 @@ export default function SearchResultsPage({
                         From: {from.location_name} | To: {to.location_name}
                     </p>
                 </div>
-                <SearchResults routes={routes} from={from} to={to} indirectRoutes={indirectRoutes} intersectStops={intersectStops} />
+                <SearchResults
+                    routes={routes}
+                    from={from}
+                    to={to}
+                    indirectRoutes={indirectRoutes}
+                    intersectStops={intersectStops}
+                />
             </div>
         </Layout>
     );

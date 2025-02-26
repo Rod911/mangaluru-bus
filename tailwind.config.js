@@ -43,6 +43,7 @@ export default {
                     DEFAULT: "#009fd8",
                     hover: "#0088b9",
                     focus: "#006fa2",
+                    light: "#e3f8ff",
                     text: "#fff",
                 },
                 destructive: {

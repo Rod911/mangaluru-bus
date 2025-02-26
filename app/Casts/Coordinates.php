@@ -13,8 +13,10 @@ class Coordinates implements CastsAttributes {
      * @return array<string, mixed>
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): array {
-        [$latitude, $longitude] = preg_split('/\s+/', $value);
-        return compact('latitude', 'longitude');
+        @[$latitude, $longitude] = preg_split('/\s+/', $value ?? " ");
+        $latitude = $latitude ? floatval($latitude) : null;
+        $longitude = $longitude ? floatval($longitude) : null;
+        return @compact('latitude', 'longitude');
     }
     /**
      * Prepare the given value for storage.

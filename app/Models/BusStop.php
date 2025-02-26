@@ -17,12 +17,20 @@ class BusStop extends Model {
         'is_two_way',
         'coordinates',
     ];
+
     protected $spatialFields = [
         'coordinates',
     ];
+
     protected $casts = [
         'is_two_way' => 'boolean',
     ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     protected function casts(): array {
         return [
             'coordinates' => Coordinates::class,

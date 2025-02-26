@@ -27,9 +27,9 @@ export default function Routes({
     const { data, setData, post, patch, processing, errors, reset } = useForm({
         uuid: routeData?.uuid ?? "",
         routeName: routeData?.route_name ?? "",
-        hasLocal: routeData?.has_local === 1,
-        hasGovt: routeData?.has_govt === 1,
-        hasExpress: routeData?.has_express === 1,
+        hasLocal: routeData?.has_local,
+        hasGovt: routeData?.has_govt,
+        hasExpress: routeData?.has_express,
         routeStops: routeData?.route_stops ?? ([] as RouteStop[]),
     });
 

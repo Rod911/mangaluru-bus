@@ -136,7 +136,9 @@ export default function DataTable({
     };
 
     const [pageSize, setPageSize] = useState<number>(
-        urlParams.pageSize || pageSizes[Object.keys(pageSizes)[0]]
+        urlParams.pageSize ||
+            parseInt(localStorage.getItem("pageSize") as string) ||
+            pageSizes[Object.keys(pageSizes)[0]]
     );
     const [pageQuery, setPageQuery] = useState<string>(
         urlParams.pageQuery || ""
@@ -150,9 +152,13 @@ export default function DataTable({
                         <SelectInput
                             className="dtable-page-size"
                             options={pageSizes}
-                            onChange={(e) =>
-                                setPageSize(Number(e.target.value))
-                            }
+                            onChange={(e) => {
+                                setPageSize(Number(e.target.value));
+                                localStorage.setItem(
+                                    "pageSize",
+                                    e.target.value
+                                );
+                            }}
                             value={pageSize}
                         />
                     </div>
@@ -276,6 +282,7 @@ function Dtable({
     let pagination = {
         current_page: 1,
         total: 0,
+        filtered_total: 0,
         per_page: pageSize,
     } as FetchResponse["pagination"];
 
@@ -480,7 +487,7 @@ function Dtable({
                         </tr>
                     )}
                 </tbody>
-                {paginate && (
+                {paginate && tableData && tableData.length > 0 && (
                     <tfoot>
                         <tr>
                             <td
@@ -496,7 +503,10 @@ function Dtable({
                                         <p>
                                             Showing {pageStart + 1} to{" "}
                                             {pageStart + tableData.length} of{" "}
-                                            {pagination.total}
+                                            {pagination.filtered_total}
+                                            {pagination.total >
+                                                pagination.filtered_total &&
+                                                ` (filtered from ${pagination.total})`}
                                         </p>
                                     )}
                                     <PaginatedLinks
