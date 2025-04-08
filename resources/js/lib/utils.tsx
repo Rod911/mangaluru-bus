@@ -44,3 +44,10 @@ export const componentRenderers = {
     h5: HeadingRenderer,
     h6: HeadingRenderer,
 };
+
+export function toSlug(value: string) {
+    return value
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+}

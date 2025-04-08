@@ -51,24 +51,50 @@ class HomeController extends Controller {
         ]);
 
         if ($type == 'location') {
-            return $this->locationSearch($from, $to);
+            return $this->_locationSearch($from, $to);
         }
-        return $this->routeSearch($route);
+        return $this->_routeSearch($route);
     }
 
-    private function locationSearch($from, $to) {
+    public function routes(Request $request, $slugFrom = null, $slugTo = null) {
+        SearchLog::create([
+            'type' => 'location',
+            'from' => $slugFrom,
+            'to' => $slugTo,
+            'route' => '',
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return $this->_locationSearch($slugFrom, $slugTo);
+    }
+
+    public function routeSearch($route) {
+        SearchLog::create([
+            'type' => 'route',
+            'from' => '',
+            'to' => '',
+            'route' => $route,
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        return $this->_routeSearch($route);
+    }
+
+    private function _locationSearch($from, $to) {
         if ($from == $to) {
             return Inertia::render('SearchErrorPage', [
                 'app_name' => env('APP_NAME'),
                 'error' => 'From and To location cannot be the same',
             ]);
         }
-        $fromLocation = Location::where('uuid', $from)->first();
-        $toLocation = Location::where('uuid', $to)->first();
+        $fromLocation = Location::where('url_slug', $from)->first();
+        $toLocation = Location::where('url_slug', $to)->first();
         $routes = Route::select('routes.*')
             ->selectRaw('GROUP_CONCAT(`route_stops`.`order`) as stop_order')
             ->join('route_stops', 'route_stops.route_id', '=', 'routes.uuid')
-            ->whereIn('route_stops.location_id', [$from, $to])
+            ->whereIn('route_stops.location_id', [$fromLocation->uuid, $toLocation->uuid])
             ->groupBy('routes.uuid')
             ->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
             ->orderBy('route_stops.order', 'asc')
@@ -85,10 +111,10 @@ class HomeController extends Controller {
         $indirectRoutes = [];
         $intersectStops = [];
         $intersectStopsDetails = [];
-        if (count($routes) < 5) {
+        if (count($routes) < 3) {
             $sourceBus = Route::select('routes.*', 'route_stops.order as boardingPoint')
                 ->join('route_stops', 'route_stops.route_id', '=', 'routes.uuid')
-                ->where('route_stops.location_id', $from)
+                ->where('route_stops.location_id', $fromLocation->uuid)
                 ->whereNotIn('routes.route_name', $routeNames)
                 ->groupBy('routes.uuid')
                 ->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
@@ -98,7 +124,7 @@ class HomeController extends Controller {
                 }, 'routeStops.location']);
             $destBus = Route::select('routes.*', 'route_stops.order as boardingPoint')
                 ->join('route_stops', 'route_stops.route_id', '=', 'routes.uuid')
-                ->where('route_stops.location_id', $to)
+                ->where('route_stops.location_id', $toLocation->uuid)
                 ->groupBy('routes.uuid')
                 ->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
                 ->get()
@@ -120,10 +146,10 @@ class HomeController extends Controller {
                             if (
                                 $stopA->location_id === $stopB->location_id
                                 && !in_array($stopA->location_id, $stops)
-                                && $stopA->location_id !== $from
-                                && $stopB->location_id !== $from
-                                && $stopA->location_id !== $from
-                                && $stopB->location_id !== $from
+                                && $stopA->location_id !== $fromLocation->uuid
+                                && $stopB->location_id !== $fromLocation->uuid
+                                && $stopA->location_id !== $fromLocation->uuid
+                                && $stopB->location_id !== $fromLocation->uuid
                             ) {
                                 $stops[] = $stopA->location_id;
                                 $stopsDetails[] = $stopA;
@@ -151,7 +177,7 @@ class HomeController extends Controller {
         ]);
     }
 
-    private function routeSearch($route) {
+    private function _routeSearch($route) {
         $routes = Route::whereLike('route_name', '%' . $route . '%')
             ->orderByRaw('CAST(SUBSTR(route_name, 1, INSTR(route_name || "A", "A")-1) AS INTEGER)')
             ->orderBy('route_name')
@@ -164,6 +190,7 @@ class HomeController extends Controller {
             ]);
         return Inertia::render('RouteResultsPage', [
             'app_name' => env('APP_NAME'),
+            'query' => $route,
             'routes' => $routes,
         ]);
     }
@@ -176,9 +203,8 @@ class HomeController extends Controller {
         ]);
     }
 
-    public function location(Request $request) {
-        $location = $request->location;
-        $location = Location::findOrFail($location)->load([
+    public function location(string $location) {
+        $location = Location::where('url_slug', $location)->first()->load([
             'routes' => function ($query) {
                 $query->orderByRaw('CAST(SUBSTR(routes.route_name, 1, INSTR(routes.route_name || "A", "A")-1) AS INTEGER)')
                     ->orderBy('route_name');
@@ -293,4 +319,8 @@ class HomeController extends Controller {
             'app_name' => env('APP_NAME'),
         ]);
     }
+}
+
+function deSlug($slug) {
+    return str_replace('-', ' ', $slug);
 }

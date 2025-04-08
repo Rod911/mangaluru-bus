@@ -1,3 +1,4 @@
+import { toSlug } from "@/lib/utils";
 import { PopularLocation } from "@/types";
 import { Link } from "@inertiajs/react";
 import {
@@ -28,10 +29,9 @@ export default function QuickAccessSection({
                         {popularLocations.map((location, index) => (
                             <Link
                                 key={index}
-                                href={route("search", {
-                                    from: location.from_location?.uuid,
-                                    towards: location.to_location?.uuid,
-                                    type: location.type,
+                                href={route("routes", {
+                                    from: toSlug(location.from_location?.location_name || ""),
+                                    to: toSlug(location.to_location?.location_name || ""),
                                 })}
                                 className="bg-white p-4 rounded shadow hover:shadow-md transition-shadow duration-200"
                             >
@@ -52,9 +52,8 @@ export default function QuickAccessSection({
                         {popularRoutes.map((busRoute, index) => (
                             <Link
                                 key={index}
-                                href={route("search", {
+                                href={route("routes-search", {
                                     route: busRoute.route,
-                                    type: busRoute.type,
                                 })}
                                 className="bg-white p-4 rounded shadow hover:shadow-md transition-shadow duration-200"
                             >

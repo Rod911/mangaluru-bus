@@ -41,9 +41,9 @@ export default function AllLocationsPage({
                         const location = result.original;
                         return (
                             <Link
-                                key={location.uuid}
+                                key={location.url_slug}
                                 href={route("location", {
-                                    location: location.uuid,
+                                    location: location.url_slug,
                                 })}
                                 className="bg-white p-4 rounded shadow hover:shadow-md transition-shadow duration-200"
                             >

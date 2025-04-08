@@ -37,16 +37,16 @@ export default function SearchSection({
     }
 
     function handleSubmit(data: z.infer<typeof FormSchema>) {
-        router.get(route("search"), { ...data, type: searchType });
+        router.get(route("routes", { from: data.from, to: data.towards }));
     }
 
     function handleRouteSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        router.get(route("search"), { ...values, type: searchType });
+        router.get(route("routes-search", { route: values.route }));
     }
 
     const locationOptions = locations.map((loc) => ({
-        value: loc.uuid,
+        value: loc.url_slug,
         label: loc.location_name,
     }));
 

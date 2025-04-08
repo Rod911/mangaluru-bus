@@ -14,8 +14,8 @@ class Issue extends Model {
         'notes',
     ];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];
+    // protected $hidden = [
+    //     'created_at',
+    //     'updated_at',
+    // ];
 }

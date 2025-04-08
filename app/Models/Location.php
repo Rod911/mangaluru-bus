@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Str;
 
 class Location extends Model {
     use HasUuids;
@@ -33,5 +34,12 @@ class Location extends Model {
 
     public function routes(): HasManyThrough {
         return $this->hasManyThrough(Route::class, RouteStop::class, 'location_id', 'uuid', 'uuid', 'route_id');
+    }
+
+    protected static function boot() {
+        parent::boot();
+        static::saving(function ($location) {
+            $location->url_slug = Str::of($location->location_name)->slug('-');
+        });
     }
 }

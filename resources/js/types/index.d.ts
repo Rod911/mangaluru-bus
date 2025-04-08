@@ -67,6 +67,7 @@ export type Location = {
     bus_stops: BusStop[];
     created_at: Date;
     updated_at: Date;
+    url_slug: string;
 };
 
 export type LocationDetails = Location & {

@@ -26,8 +26,8 @@ export default function SearchResults({
             {routes.map((result, index) => {
                 const stopOrder = result.stop_order.toSorted((a, b) => a - b);
                 const towardsLast =
-                    result.route_stops[stopOrder[0]].location.uuid ===
-                    from.uuid;
+                    result.route_stops[stopOrder[0]].location.url_slug ===
+                    from.url_slug;
                 const stopsBetween = stopOrder[1] - stopOrder[0];
                 const routeStops = towardsLast
                     ? result.route_stops
@@ -123,9 +123,9 @@ export default function SearchResults({
                                                         stop.location
                                                             .location_name
                                                     }
-                                                    <small className="text-sm text-gray-700 overflow-hidden text-ellipsis">
+                                                    {/* <small className="text-sm text-gray-700 overflow-hidden text-ellipsis">
                                                         {stop.location.address}
-                                                    </small>
+                                                    </small> */}
                                                 </p>
                                             </div>
                                         </li>
@@ -165,11 +165,11 @@ export default function SearchResults({
                             </div>
                         </div>
                     </div>
-                    {indirectRoutes.map((route, index) => {
-                        const result = route.route;
+                    {indirectRoutes.map((locationRoute, index) => {
+                        const result = locationRoute.route;
                         const towardsLast =
                             result.route_stops[result.boardingPoint].location
-                                .uuid === from.uuid;
+                                .url_slug === from.url_slug;
                         const routeStops = towardsLast
                             ? result.route_stops
                             : result.route_stops.toReversed();
@@ -212,7 +212,7 @@ export default function SearchResults({
                                             const startIndex =
                                                 index === sortedBoardingPoint;
                                             const deboardIndex =
-                                                route.switchingPoints.find(
+                                                locationRoute.switchingPoints.find(
                                                     (point) =>
                                                         point.order === index
                                                 );
@@ -241,15 +241,15 @@ export default function SearchResults({
                                                         {deboardIndex ? (
                                                             <Link
                                                                 className="block"
-                                                                href={
-                                                                    "/search?from=" +
-                                                                    stop
-                                                                        .location
-                                                                        .uuid +
-                                                                    "&towards=" +
-                                                                    to.uuid +
-                                                                    "&type=location"
-                                                                }
+                                                                href={route(
+                                                                    "routes",
+                                                                    {
+                                                                        from: stop
+                                                                            .location
+                                                                            .url_slug,
+                                                                        to: to.url_slug,
+                                                                    }
+                                                                )}
                                                             >
                                                                 <ExternalLink
                                                                     size={18}
@@ -300,13 +300,10 @@ export default function SearchResults({
                     {intersectStops.map((stop, index) => {
                         return (
                             <Link
-                                href={
-                                    "/search?from=" +
-                                    stop.location.uuid +
-                                    "&towards=" +
-                                    to.uuid +
-                                    "&type=location"
-                                }
+                                href={route("routes", {
+                                    from: stop.location.url_slug,
+                                    to: to.url_slug,
+                                })}
                                 key={index}
                                 className="bg-white rounded-lg shadow-md border-t border-gray-100"
                             >

@@ -16,7 +16,7 @@ class IssueController extends Controller {
 
     public function paginateIssues(Request $request) {
         $issues = Issue::orderBy('created_at', 'desc');
-        return Paginate::format($request, Issue::class, $issues, 'description');
+        return Paginate::format($request, Issue::class, $issues, ['description', 'type', 'contact']);
     }
 
     public function destroy(DestroyIssueRequest $request) {

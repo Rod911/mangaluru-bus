@@ -12,7 +12,7 @@ export default function LocationPage({
     location: LocationDetails;
 }) {
     const routes = location.routes;
-    const activeIndices = location.routes.map((route) =>
+    const activeIndices = routes.map((route) =>
         route.route_stops.findIndex(
             (stop) => stop.location_id === location.uuid
         )
@@ -70,9 +70,9 @@ export default function LocationPage({
                     >
                         <LeafletMap
                             positions={mapMarkers}
-                            paths={mapPaths}
+                            paths={[]}
                             zoom={17}
-                            mapKey={location.uuid}
+                            mapKey={location.url_slug}
                         />
                     </div>
                 )}

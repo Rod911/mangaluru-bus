@@ -26,10 +26,10 @@ class SearchLog extends Model {
     ];
 
     public function fromLocation(): BelongsTo {
-        return $this->belongsTo(Location::class, 'from', 'uuid');
+        return $this->belongsTo(Location::class, 'from', 'url_slug');
     }
 
     public function toLocation(): BelongsTo {
-        return $this->belongsTo(Location::class, 'to', 'uuid');
+        return $this->belongsTo(Location::class, 'to', 'url_slug');
     }
 }

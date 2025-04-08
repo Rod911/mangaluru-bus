@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('routes/{from}/{to}', [HomeController::class, 'routes'])->name('routes');
+Route::get('routes-search/{route}', [HomeController::class, 'routeSearch'])->name('routes-search');
 Route::get('search', [HomeController::class, 'search'])->name('search');
 Route::get('all-locations', [HomeController::class, 'allLocations'])->name('all-locations');
-Route::get('location', [HomeController::class, 'location', ['location' => '{location}']])->name('location');
+Route::get('location/{location}', [HomeController::class, 'location'])->name('location');
 Route::get('all-routes/{type?}', [HomeController::class, 'allRoutes'])->name('all-routes');
 Route::get('report-issue', [HomeController::class, 'reportIssue'])->name('report-issue');
 Route::post('report-issue', [HomeController::class, 'storeReportIssue'])->name('report-issue.store');

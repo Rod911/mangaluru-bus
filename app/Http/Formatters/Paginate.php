@@ -13,7 +13,7 @@ class Paginate {
      * @param Request $request
      * @param class-string<Model> $model
      * @param Builder $collection
-     * @param string|null $search
+     * @param string[]|string|null $search
      * @param string|null $groupKey
      *
      * @return \Illuminate\Http\JsonResponse
@@ -27,16 +27,16 @@ class Paginate {
             ->limit($pageSize)
             ->offset(($page - 1) * $pageSize);
         if ($search) {
-            $collection->where($search, 'like', '%' . $query . '%');
+            if (!is_array($search)) $search = [$search];
+            $collection->whereAny($search, 'like', '%' . $query . '%');
         }
 
         if ($groupKey) {
             $collection = $collection->groupBy($groupKey);
         }
 
-        $collection = $collection
-            ->get();
-        $filteredTotal = $model::where($search, 'like', '%' . $query . '%')->count();
+        $collection = $collection->get();
+        $filteredTotal = $model::whereAny($search, 'like', '%' . $query . '%')->count();
         $total = $model::count();
 
         return response()->json([

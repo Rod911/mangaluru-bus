@@ -7,6 +7,7 @@ import {
     AccordionTrigger,
 } from "@/Components/ui/accordion";
 import LeafletMap from "../LeafletMap";
+import { Link } from "@inertiajs/react";
 
 export default function RouteResults({
     routes,
@@ -16,7 +17,13 @@ export default function RouteResults({
     activeIndices?: number[];
 }) {
     return (
-        <Accordion type="multiple" className="grid gap-2" defaultValue={routes.length === 1 ? [routes[0].route_name] : undefined}>
+        <Accordion
+            type="multiple"
+            className="grid gap-2"
+            defaultValue={
+                routes.length === 1 ? [routes[0].route_name] : undefined
+            }
+        >
             {routes.map((result, index) => {
                 const activeStop = activeIndices?.[index];
                 const mapMarkers = result.route_stops
@@ -89,7 +96,7 @@ export default function RouteResults({
                                 )}
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className="border-t border-gray-200 py-4 px-8 grid gap-2 grid-cols-2 max-md:grid-cols-1">
+                        <AccordionContent className="border-t border-gray-200 py-4 px-5 grid gap-2 grid-cols-2 max-md:grid-cols-1">
                             <ul className="flex flex-col">
                                 {result.route_stops.map((stop, index) => {
                                     const indexActive = index === activeStop;
@@ -100,7 +107,7 @@ export default function RouteResults({
                                         >
                                             <div
                                                 className={
-                                                    "relative rounded-full p-0.5 size-7 content-center place-items-center " +
+                                                    "relative rounded-full p-0.5 size-7 content-center place-items-center flex-shrink-0 " +
                                                     (indexActive
                                                         ? "bg-primary text-white"
                                                         : "bg-gray-300")
@@ -111,16 +118,23 @@ export default function RouteResults({
                                                 )}
                                                 <MapPin size={18} />
                                             </div>
-                                            <div className="">
-                                                <p className="flex place-items-baseline gap-2">
+                                            <div className="max-w-full overflow-hidden">
+                                                <Link
+                                                    href={route("location", {
+                                                        location:
+                                                            stop.location
+                                                                .url_slug,
+                                                    })}
+                                                    className="flex place-items-baseline gap-2 text-nowrap"
+                                                >
                                                     {
                                                         stop.location
                                                             .location_name
                                                     }
-                                                    <small className="text-sm text-gray-700">
+                                                    {/* <small className="text-sm text-gray-700 overflow-hidden text-ellipsis">
                                                         {stop.location.address}
-                                                    </small>
-                                                </p>
+                                                    </small> */}
+                                                </Link>
                                             </div>
                                         </li>
                                     );
