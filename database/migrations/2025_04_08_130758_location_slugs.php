@@ -14,27 +14,27 @@ return new class extends Migration {
             Schema::table('locations', function (Blueprint $table) {
                 $table->string('url_slug', 50)->nullable()->unique();
             });
-            $locs = Location::get();
-            foreach ($locs as $location) DB::table('locations')->where('uuid', $location->uuid)->update(['url_slug' => Str::of($location->location_name)->slug('-')]);
-            SearchLog::where('type', 'location')->get()->load(['fromLocation', 'toLocation'])->each(function ($log) {
-                if ($log->fromLocation->url_slug === null || $log->toLocation->url_slug === null) {
-                    throw new Exception('Location slugs not generated');
-                }
-                $log->update([
-                    'from' => $log->fromLocation->url_slug,
-                    'to' => $log->toLocation->url_slug,
-                ]);
-            });
+            // $locs = Location::get();
+            // foreach ($locs as $location) DB::table('locations')->where('uuid', $location->uuid)->update(['url_slug' => Str::of($location->location_name)->slug('-')]);
+            // SearchLog::where('type', 'location')->get()->load(['fromLocation', 'toLocation'])->each(function ($log) {
+            //     if ($log->fromLocation->url_slug === null || $log->toLocation->url_slug === null) {
+            //         throw new Exception('Location slugs not generated');
+            //     }
+            //     $log->update([
+            //         'from' => $log->fromLocation->url_slug,
+            //         'to' => $log->toLocation->url_slug,
+            //     ]);
+            // });
         });
     }
 
     public function down(): void {
-        SearchLog::where('type', 'location')->with(['fromLocation', 'toLocation'])->each(function ($log) {
-            $log->update([
-                'from' => $log->fromLocation->uuid,
-                'to' => $log->toLocation->uuid,
-            ]);
-        });
+        // SearchLog::where('type', 'location')->with(['fromLocation', 'toLocation'])->each(function ($log) {
+        //     $log->update([
+        //         'from' => $log->fromLocation->uuid,
+        //         'to' => $log->toLocation->uuid,
+        //     ]);
+        // });
         Schema::table('locations', function (Blueprint $table) {
             $table->dropColumn('url_slug');
         });
