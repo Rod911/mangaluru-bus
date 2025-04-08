@@ -4,7 +4,7 @@
     "description": "Search for your bus in Mangalore City.",
     "theme_color": "#009fd8",
     "background_color": "#009fd8",
-    "display": "standalone",
+    "display": "minimal-ui",
     "display_override": [
         "window-control-overlay",
         "minimal-ui"
