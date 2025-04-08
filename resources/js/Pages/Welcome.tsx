@@ -21,7 +21,7 @@ export default function HomePage({
 }>) {
     return (
         <>
-            <Head title="City Bus Route Information for Mangalore City">
+            <Head title="Bus Route Information for Mangalore City">
                 <link
                     rel="canonical"
                     href="https://mangaluru-bus.rmalc911.in/"

@@ -42,7 +42,7 @@ export default function LocationPage({
         .filter((path) => !!path);
     return (
         <Layout app_name={app_name}>
-            <Head title="All Routes" />
+            <Head title={location.location_name + " busses"} />
             <div className="container mx-auto px-4 py-8">
                 <section className="mb-6">
                     <h1 className="text-3xl font-bold">

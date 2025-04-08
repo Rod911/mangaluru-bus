@@ -23,7 +23,9 @@ export default function Layout({
                     rel="icon"
                     type="image/png"
                     href="/images/mangaluru-bus-i.png"
+                    sizes="any"
                 />
+                <link rel="manifest" href="/site.webmanifest" />
             </Head>
             <div className="min-h-screen flex flex-col">
                 <header className="bg-primary text-white p-4 sticky top-0 z-10">
