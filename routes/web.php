@@ -21,8 +21,6 @@ Route::get('about', [HomeController::class, 'about'])->name('about');
 Route::get('terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('privacy', [HomeController::class, 'privacy'])->name('privacy');
 
-Route::get('migrate', [HomeController::class, 'migrate']);
-
 Route::prefix('admin')->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', function () {

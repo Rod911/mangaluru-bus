@@ -24,7 +24,7 @@ export default function HomePage({
             <Head title="Bus Route Information for Mangalore City">
                 <link
                     rel="canonical"
-                    href="https://mangaluru-bus.rmalc911.in/"
+                    href="https://mangaluru-bus.in/"
                 />
             </Head>
             <Layout app_name={app_name}>

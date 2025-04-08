@@ -321,18 +321,4 @@ class HomeController extends Controller {
             'app_name' => env('APP_NAME'),
         ]);
     }
-
-    public function migrate() {
-        $locs = Location::get();
-        foreach ($locs as $location) DB::table('locations')->where('uuid', $location->uuid)->update(['url_slug' => Str::of($location->location_name)->slug('-')]);
-        SearchLog::where('type', 'location')->get()->load(['fromLocation', 'toLocation'])->each(function ($log) {
-            if ($log->fromLocation->url_slug === null || $log->toLocation->url_slug === null) {
-                throw new Exception('Location slugs not generated');
-            }
-            $log->update([
-                'from' => $log->fromLocation->url_slug,
-                'to' => $log->toLocation->url_slug,
-            ]);
-        });
-    }
 }

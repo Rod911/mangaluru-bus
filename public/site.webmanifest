@@ -5,8 +5,8 @@
     "theme_color": "#009fd8",
     "background_color": "#009fd8",
     "display": "fullscreen",
-    "scope": "https://mangaluru-bus.rmalc911.in/",
-    "start_url": "https://mangaluru-bus.rmalc911.in/",
+    "scope": "https://mangaluru-bus.in/",
+    "start_url": "https://mangaluru-bus.in/",
     "icons": [
         {
             "src": "./android-chrome-192x192.png",

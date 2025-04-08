@@ -2,7 +2,7 @@
 
 **Last updated February 26, 2025**
 
-Welcome to MangaluruBus ("we," "our," or "us"). By using our website ([https://mangaluru-bus.rmalc911.in/](https://mangaluru-bus.rmalc911.in/)), you agree to the following Terms & Conditions. If you do not agree with these terms, please refrain from using our platform.
+Welcome to MangaluruBus ("we," "our," or "us"). By using our website ([https://mangaluru-bus.in/](https://mangaluru-bus.in/)), you agree to the following Terms & Conditions. If you do not agree with these terms, please refrain from using our platform.
 
 ## 1\.  Service Description
 
@@ -22,7 +22,7 @@ We provide our services "as-is" without any guarantees of accuracy, reliability,
 
 ## 5\.  Privacy Policy
 
-Our Privacy Policy, available at [https://mangaluru-bus.rmalc911.in/privacy/](https://mangaluru-bus.rmalc911.in/privacy/), explains how we handle user data. By using our site, you agree to the terms of our Privacy Policy.
+Our Privacy Policy, available at [https://mangaluru-bus.in/privacy/](https://mangaluru-bus.in/privacy/), explains how we handle user data. By using our site, you agree to the terms of our Privacy Policy.
 
 ## 6\.  Modifications to Terms
 
