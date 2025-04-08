@@ -21,7 +21,12 @@ export default function HomePage({
 }>) {
     return (
         <>
-            <Head title="City Bus Route Information for Mangaluru | Local, Express & KSRTC Routes"></Head>
+            <Head title="City Bus Route Information for Mangalore City">
+                <link
+                    rel="canonical"
+                    href="https://mangaluru-bus.rmalc911.in/"
+                />
+            </Head>
             <Layout app_name={app_name}>
                 <div className="container mx-auto px-4 py-8 gap-y-8 grid">
                     <SearchSection locations={locations} />

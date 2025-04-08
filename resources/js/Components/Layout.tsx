@@ -16,7 +16,7 @@ export default function Layout({
             <Head>
                 <meta
                     name="description"
-                    content="Find comprehensive bus route information for Mangaluru city, including local, express, and KSRTC services. Discover direct routes and connecting buses for all destinations."
+                    content="Find comprehensive bus route information for Mangalore city. Discover direct routes and connecting buses for all destinations."
                 />
                 <link rel="shortcut icon" href="/images/mangaluru-bus-i.png" />
                 <link
@@ -36,6 +36,8 @@ export default function Layout({
                                 src="/images/mangaluru-bus-hw.png"
                                 alt={app_name}
                                 className="h-16"
+                                width={242}
+                                height={64}
                             />
                         </Link>
                         <nav className="hidden md:block">
@@ -53,6 +55,7 @@ export default function Layout({
                         <button
                             className="md:hidden"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            aria-label="Toggle menu"
                         >
                             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
@@ -87,7 +90,7 @@ export default function Layout({
                             <div className="mb-4 md:mb-0">
                                 <p className="">
                                     &copy; 2025 {app_name} - The comprehensive
-                                    bus route finder for Mangaluru city
+                                    bus route finder for Mangalore city
                                 </p>
                             </div>
                             <nav>

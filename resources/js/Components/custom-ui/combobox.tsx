@@ -74,6 +74,7 @@ export function Combobox({
                             triggerClassName
                         )}
                         size="lg"
+                        aria-label={"Select " + placeholder}
                     >
                         {display}
                         <ChevronsUpDown className="opacity-50" />

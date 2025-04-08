@@ -25,7 +25,7 @@ export default function SearchResultsPage({
                     from.location_name +
                     " To " +
                     to.location_name +
-                    " in busses Mangaluru"
+                    " in busses Mangalore"
                 }
             />
             <div className="container mx-auto px-4 py-8">

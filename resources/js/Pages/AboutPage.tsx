@@ -15,10 +15,10 @@ export default function AboutPage({ app_name }: { app_name: string }) {
                         <p className=" mb-4">
                             MangaluruBus provides comprehensive route
                             information for all public transportation in
-                            Mangaluru city. Our service helps you find the most
+                            Mangalore city. Our service helps you find the most
                             convenient bus routes across local, express, and
                             KSRTC services. Whether you're a resident, student,
-                            or tourist, we make navigating Mangaluru's public
+                            or tourist, we make navigating Mangalore's public
                             transport network simple.
                         </p>
                         <p className="">

@@ -3,7 +3,7 @@ export default function FaqSection() {
         {
             question:
                 "What types of buses does MangaluruBus provide information for?",
-            answer: "MangaluruBus provides comprehensive route information for all types of public buses in Mangaluru, including local city buses, express services, and KSRTC buses connecting to surrounding areas.",
+            answer: "MangaluruBus provides comprehensive route information for all types of public buses in Mangalore city, including local city buses, express services, and KSRTC buses connecting to surrounding areas.",
         },
         {
             question:

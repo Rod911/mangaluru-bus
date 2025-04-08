@@ -16,7 +16,7 @@ export default function RouteResults({
     activeIndices?: number[];
 }) {
     return (
-        <Accordion type="multiple" className="grid gap-2">
+        <Accordion type="multiple" className="grid gap-2" defaultValue={routes.length === 1 ? [routes[0].route_name] : undefined}>
             {routes.map((result, index) => {
                 const activeStop = activeIndices?.[index];
                 const mapMarkers = result.route_stops
