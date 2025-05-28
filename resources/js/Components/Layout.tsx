@@ -26,6 +26,8 @@ export default function Layout({
                     sizes="any"
                 />
                 <link rel="manifest" href="/site.webmanifest" />
+                {/* Google Ads */}
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7232181727425467" crossOrigin="anonymous"></script>
             </Head>
             <div className="min-h-screen flex flex-col">
                 <header className="bg-primary text-white p-4 sticky top-0 z-10">
